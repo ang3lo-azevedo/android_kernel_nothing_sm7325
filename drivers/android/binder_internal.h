@@ -444,6 +444,7 @@ enum binder_prio_state {
  * @is_frozen:            process is frozen and unable to service
  *                        binder transactions
  *                        (protected by @inner_lock)
+<<<<<<< HEAD
  * @sync_recv:            process received sync transactions since last frozen
 <<<<<<< HEAD
  *                        bit 0: received sync transaction after being frozen
@@ -453,6 +454,8 @@ enum binder_prio_state {
  *                        (protected by @inner_lock)
  * @async_recv:           process received async transactions since last frozen
  *                        (protected by @inner_lock)
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
  * @freeze_wait:          waitqueue of processes waiting for all outstanding
  *                        transactions to be processed
  *                        (protected by @inner_lock)
@@ -503,8 +506,11 @@ struct binder_proc {
 	int outstanding_txns;
 	bool is_dead;
 	bool is_frozen;
+<<<<<<< HEAD
 	bool sync_recv;
 	bool async_recv;
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	wait_queue_head_t freeze_wait;
 
 	struct list_head todo;

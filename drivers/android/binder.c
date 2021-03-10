@@ -3224,6 +3224,7 @@ static int binder_proc_transaction(struct binder_transaction *t,
 	binder_inner_proc_unlock(proc);
 	binder_node_unlock(node);
 
+<<<<<<< HEAD
 	/*
 	 * To reduce potential contention, free the outdated transaction and
 	 * buffer after releasing the locks.
@@ -3240,6 +3241,8 @@ static int binder_proc_transaction(struct binder_transaction *t,
 		binder_stats_deleted(BINDER_STAT_TRANSACTION);
 	}
 
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	return 0;
 }
 
@@ -4004,8 +4007,14 @@ static void binder_transaction(struct binder_proc *proc,
 	if (reply) {
 		binder_enqueue_thread_work(thread, tcomplete);
 		binder_inner_proc_lock(target_proc);
+<<<<<<< HEAD
 		if (target_thread->is_dead) {
 			return_error = BR_DEAD_REPLY;
+=======
+		if (target_thread->is_dead || target_proc->is_frozen) {
+			return_error = target_thread->is_dead ?
+				BR_DEAD_REPLY : BR_FROZEN_REPLY;
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 			binder_inner_proc_unlock(target_proc);
 			goto err_dead_proc_or_thread;
 		}
@@ -5930,6 +5939,7 @@ static int binder_ioctl_get_node_debug_info(struct binder_proc *proc,
 	return 0;
 }
 
+<<<<<<< HEAD
 static bool binder_txns_pending_ilocked(struct binder_proc *proc)
 {
 	struct rb_node *n;
@@ -6033,6 +6043,8 @@ static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 
 =======
 >>>>>>> ce664fbdcc0c (BACKPORT: FROMGIT: binder: fix freeze race)
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 static int binder_ioctl_freeze(struct binder_freeze_info *info,
 			       struct binder_proc *target_proc)
 {
@@ -6040,11 +6052,16 @@ static int binder_ioctl_freeze(struct binder_freeze_info *info,
 
 	if (!info->enable) {
 		binder_inner_proc_lock(target_proc);
+<<<<<<< HEAD
 		target_proc->sync_recv = false;
 		target_proc->async_recv = false;
 		target_proc->is_frozen = false;
 		binder_inner_proc_unlock(target_proc);
 		binder_add_freeze_work(target_proc, false);
+=======
+		target_proc->is_frozen = false;
+		binder_inner_proc_unlock(target_proc);
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 		return 0;
 	}
 
@@ -6054,8 +6071,11 @@ static int binder_ioctl_freeze(struct binder_freeze_info *info,
 	 * for transactions to drain.
 	 */
 	binder_inner_proc_lock(target_proc);
+<<<<<<< HEAD
 	target_proc->sync_recv = false;
 	target_proc->async_recv = false;
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	target_proc->is_frozen = true;
 	binder_inner_proc_unlock(target_proc);
 
@@ -6065,6 +6085,7 @@ static int binder_ioctl_freeze(struct binder_freeze_info *info,
 			(!target_proc->outstanding_txns),
 			msecs_to_jiffies(info->timeout_ms));
 
+<<<<<<< HEAD
 	/* Check pending transactions that wait for reply */
 	if (ret >= 0) {
 		binder_inner_proc_lock(target_proc);
@@ -6072,18 +6093,26 @@ static int binder_ioctl_freeze(struct binder_freeze_info *info,
 			ret = -EAGAIN;
 		binder_inner_proc_unlock(target_proc);
 	}
+=======
+	if (!ret && target_proc->outstanding_txns)
+		ret = -EAGAIN;
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 
 	if (ret < 0) {
 		binder_inner_proc_lock(target_proc);
 		target_proc->is_frozen = false;
 		binder_inner_proc_unlock(target_proc);
+<<<<<<< HEAD
 	} else {
 		binder_add_freeze_work(target_proc, true);
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	}
 
 	return ret;
 }
 
+<<<<<<< HEAD
 static int binder_ioctl_get_freezer_info(
 				struct binder_frozen_status_info *info)
 {
@@ -6121,6 +6150,8 @@ static int binder_ioctl_get_freezer_info(
 	return 0;
 }
 
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
 	int ret;
@@ -6299,6 +6330,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 			goto err;
 		break;
 	}
+<<<<<<< HEAD
 	case BINDER_GET_FROZEN_INFO: {
 		struct binder_frozen_status_info info;
 
@@ -6340,6 +6372,8 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 	}
 =======
 >>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	default:
 		ret = -EINVAL;
 		goto err;
@@ -6675,8 +6709,11 @@ static void binder_deferred_release(struct binder_proc *proc)
 
 	proc->is_dead = true;
 	proc->is_frozen = false;
+<<<<<<< HEAD
 	proc->sync_recv = false;
 	proc->async_recv = false;
+=======
+>>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	threads = 0;
 	active_transactions = 0;
 	while ((n = rb_first(&proc->threads))) {
