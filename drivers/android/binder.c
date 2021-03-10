@@ -6089,7 +6089,10 @@ static int binder_ioctl_get_freezer_info(
 {
 	struct binder_proc *target_proc;
 	bool found = false;
+<<<<<<< HEAD
 	__u32 txns_pending;
+=======
+>>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
 
 	info->sync_recv = 0;
 	info->async_recv = 0;
@@ -6099,9 +6102,13 @@ static int binder_ioctl_get_freezer_info(
 		if (target_proc->pid == info->pid) {
 			found = true;
 			binder_inner_proc_lock(target_proc);
+<<<<<<< HEAD
 			txns_pending = binder_txns_pending_ilocked(target_proc);
 			info->sync_recv |= target_proc->sync_recv |
 					(txns_pending << 1);
+=======
+			info->sync_recv |= target_proc->sync_recv;
+>>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
 			info->async_recv |= target_proc->async_recv;
 			binder_inner_proc_unlock(target_proc);
 		}
@@ -6310,6 +6317,7 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		}
 		break;
 	}
+<<<<<<< HEAD
 	case BINDER_ENABLE_ONEWAY_SPAM_DETECTION: {
 		uint32_t enable;
 
@@ -6330,6 +6338,8 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		binder_inner_proc_unlock(proc);
 		break;
 	}
+=======
+>>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
 	default:
 		ret = -EINVAL;
 		goto err;
