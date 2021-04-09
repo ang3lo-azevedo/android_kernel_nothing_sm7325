@@ -3938,10 +3938,13 @@ static void binder_transaction(struct binder_proc *proc,
 		return_error_line = __LINE__;
 		goto err_copy_data_failed;
 	}
+<<<<<<< HEAD
 =======
 >>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 =======
 >>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
+=======
+>>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
 	if (t->buffer->oneway_spam_suspect)
 		tcomplete->type = BINDER_WORK_TRANSACTION_ONEWAY_SPAM_SUSPECT;
 	else
@@ -6217,10 +6220,14 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 
 		if (copy_from_user(&enable, ubuf, sizeof(enable))) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 			ret = -EFAULT;
 =======
 			ret = -EINVAL;
 >>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
+=======
+			ret = -EINVAL;
+>>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
 			goto err;
 		}
 		binder_inner_proc_lock(proc);
@@ -6978,6 +6985,7 @@ static const char * const binder_return_strings[] = {
 	"BR_FAILED_REPLY",
 	"BR_FROZEN_REPLY",
 <<<<<<< HEAD
+<<<<<<< HEAD
 	"BR_ONEWAY_SPAM_SUSPECT",
 <<<<<<< HEAD
 =======
@@ -6987,6 +6995,9 @@ static const char * const binder_return_strings[] = {
 	"BR_FROZEN_BINDER",
 	"BR_CLEAR_FREEZE_NOTIFICATION_DONE",
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+	"BR_ONEWAY_SPAM_SUSPECT",
+>>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
 };
 
 static const char * const binder_command_strings[] = {

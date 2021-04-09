@@ -164,10 +164,14 @@ enum binder_stat_types {
 struct binder_stats {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	atomic_t br[_IOC_NR(BR_ONEWAY_SPAM_SUSPECT) + 1];
 =======
 	atomic_t br[_IOC_NR(BR_FROZEN_REPLY) + 1];
 >>>>>>> a4e84758f029 (UPSTREAM: binder: fix the missing BR_FROZEN_REPLY in binder_return_strings)
+=======
+	atomic_t br[_IOC_NR(BR_ONEWAY_SPAM_SUSPECT) + 1];
+>>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
 	atomic_t bc[_IOC_NR(BC_REPLY_SG) + 1];
 =======
 	atomic_t br[_IOC_NR(BR_CLEAR_FREEZE_NOTIFICATION_DONE) + 1];

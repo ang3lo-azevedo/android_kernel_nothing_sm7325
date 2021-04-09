@@ -500,6 +500,7 @@ enum binder_driver_return_protocol {
 	 */
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 
@@ -518,6 +519,8 @@ enum binder_driver_return_protocol {
 >>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
 =======
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+>>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
 };
 
 enum binder_driver_command_protocol {
