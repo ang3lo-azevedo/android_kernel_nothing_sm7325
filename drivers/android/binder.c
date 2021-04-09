@@ -3720,6 +3720,7 @@ static void binder_transaction(struct binder_proc *proc,
 			goto err_bad_object_type;
 		}
 	}
+<<<<<<< HEAD
 	/* Done processing objects, copy the rest of the buffer */
 	if (binder_alloc_copy_user_to_buffer(
 				&target_proc->alloc,
@@ -3747,6 +3748,8 @@ static void binder_transaction(struct binder_proc *proc,
 	}
 =======
 >>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
+=======
+>>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
 	if (t->buffer->oneway_spam_suspect)
 		tcomplete->type = BINDER_WORK_TRANSACTION_ONEWAY_SPAM_SUSPECT;
 	else
@@ -5955,7 +5958,11 @@ static long binder_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 		uint32_t enable;
 
 		if (copy_from_user(&enable, ubuf, sizeof(enable))) {
+<<<<<<< HEAD
 			ret = -EFAULT;
+=======
+			ret = -EINVAL;
+>>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
 			goto err;
 		}
 		binder_inner_proc_lock(proc);

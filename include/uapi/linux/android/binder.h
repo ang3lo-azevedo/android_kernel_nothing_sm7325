@@ -498,6 +498,7 @@ enum binder_driver_return_protocol {
 	 * asynchronous transaction makes the allocated async buffer size exceed
 	 * detection threshold.  No parameters.
 	 */
+<<<<<<< HEAD
 
 	BR_FROZEN_BINDER = _IOR('r', 21, struct binder_frozen_state_info),
 	/*
@@ -509,6 +510,8 @@ enum binder_driver_return_protocol {
 	/*
 	 * void *: cookie
 	 */
+=======
+>>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
 };
 
 enum binder_driver_command_protocol {
