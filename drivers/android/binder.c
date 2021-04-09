@@ -6715,7 +6715,10 @@ static const char * const binder_return_strings[] = {
 	"BR_CLEAR_DEATH_NOTIFICATION_DONE",
 	"BR_FAILED_REPLY",
 	"BR_FROZEN_REPLY",
+<<<<<<< HEAD
 	"BR_ONEWAY_SPAM_SUSPECT",
+=======
+>>>>>>> a4e84758f029 (UPSTREAM: binder: fix the missing BR_FROZEN_REPLY in binder_return_strings)
 };
 
 static const char * const binder_command_strings[] = {
