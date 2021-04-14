@@ -276,10 +276,13 @@ static void sugov_fast_switch(struct sugov_policy *sg_policy, u64 time,
 			      unsigned int next_freq)
 {
 	struct cpufreq_policy *policy = sg_policy->policy;
-	int cpu;
 
 	sugov_track_cycles(sg_policy, sg_policy->policy->cur, time);
-	cpufreq_driver_fast_switch(policy, next_freq);
+	next_freq = cpufreq_driver_fast_switch(policy, next_freq);
+	if (!next_freq)
+		return;
+
+	policy->cur = next_freq;
 }
 
 static void sugov_deferred_update(struct sugov_policy *sg_policy, u64 time,
