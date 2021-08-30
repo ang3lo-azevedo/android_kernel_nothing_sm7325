@@ -4374,7 +4374,11 @@ binder_freeze_notification_done(struct binder_proc *proc,
 static void
 binder_free_buf(struct binder_proc *proc,
 		struct binder_thread *thread,
+<<<<<<< HEAD
 		struct binder_buffer *buffer, bool is_failure)
+=======
+		struct binder_buffer *buffer)
+>>>>>>> a151ec4843a8 (FROMGIT: binder: make sure fd closes complete)
 {
 	binder_inner_proc_lock(proc);
 	if (buffer->transaction) {
@@ -4402,7 +4406,11 @@ binder_free_buf(struct binder_proc *proc,
 		binder_node_inner_unlock(buf_node);
 	}
 	trace_binder_transaction_buffer_release(buffer);
+<<<<<<< HEAD
 	binder_release_entire_buffer(proc, thread, buffer, is_failure);
+=======
+	binder_transaction_buffer_release(proc, thread, buffer, 0, false);
+>>>>>>> a151ec4843a8 (FROMGIT: binder: make sure fd closes complete)
 	binder_alloc_free_buf(&proc->alloc, buffer);
 }
 
@@ -4596,7 +4604,11 @@ static int binder_thread_write(struct binder_proc *proc,
 				     proc->pid, thread->pid, (u64)data_ptr,
 				     buffer->debug_id,
 				     buffer->transaction ? "active" : "finished");
+<<<<<<< HEAD
 			binder_free_buf(proc, thread, buffer, false);
+=======
+			binder_free_buf(proc, thread, buffer);
+>>>>>>> a151ec4843a8 (FROMGIT: binder: make sure fd closes complete)
 			break;
 		}
 
@@ -5369,7 +5381,11 @@ retry:
 			buffer->transaction = NULL;
 			binder_cleanup_transaction(t, "fd fixups failed",
 						   BR_FAILED_REPLY);
+<<<<<<< HEAD
 			binder_free_buf(proc, thread, buffer, true);
+=======
+			binder_free_buf(proc, thread, buffer);
+>>>>>>> a151ec4843a8 (FROMGIT: binder: make sure fd closes complete)
 			binder_debug(BINDER_DEBUG_FAILED_TRANSACTION,
 				     "%d:%d %stransaction %d fd fixups failed %d/%d, line %d\n",
 				     proc->pid, thread->pid,
