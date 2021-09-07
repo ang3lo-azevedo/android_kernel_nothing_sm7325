@@ -5946,6 +5946,7 @@ static bool binder_txns_pending_ilocked(struct binder_proc *proc)
 	return false;
 }
 
+<<<<<<< HEAD
 static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 {
 <<<<<<< HEAD
@@ -6030,6 +6031,8 @@ static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 >>>>>>> b6005f2f2c4a (FROMGIT: binder: fix node UAF in binder_add_freeze_work())
 }
 
+=======
+>>>>>>> ce664fbdcc0c (BACKPORT: FROMGIT: binder: fix freeze race)
 static int binder_ioctl_freeze(struct binder_freeze_info *info,
 			       struct binder_proc *target_proc)
 {
