@@ -2456,6 +2456,7 @@ err_fd_not_accepted:
 	return ret;
 }
 
+<<<<<<< HEAD
 /**
  * struct binder_ptr_fixup - data to be fixed-up in target buffer
  * @offset	offset in target buffer to fixup
@@ -2708,6 +2709,9 @@ static int binder_add_fixup(struct list_head *pf_head, binder_size_t offset,
 
 static int binder_translate_fd_array(struct list_head *pf_head,
 				     struct binder_fd_array_object *fda,
+=======
+static int binder_translate_fd_array(struct binder_fd_array_object *fda,
+>>>>>>> 72967f875273 (UPSTREAM: binder: read pre-translated fds from sender buffer)
 				     const void __user *sender_ubuffer,
 				     struct binder_buffer_object *parent,
 				     struct binder_buffer_object *sender_uparent,
@@ -2719,6 +2723,7 @@ static int binder_translate_fd_array(struct list_head *pf_head,
 	binder_size_t fda_offset;
 	const void __user *sender_ufda_base;
 	struct binder_proc *proc = thread->proc;
+<<<<<<< HEAD
 	int ret;
 <<<<<<< HEAD
 
@@ -2726,6 +2731,8 @@ static int binder_translate_fd_array(struct list_head *pf_head,
 		return 0;
 =======
 >>>>>>> ce3d788a50d7 (UPSTREAM: binder: defer copies of pre-patched txn data)
+=======
+>>>>>>> 72967f875273 (UPSTREAM: binder: read pre-translated fds from sender buffer)
 
 	fd_buf_size = sizeof(u32) * fda->num_fds;
 	if (fda->num_fds >= SIZE_MAX / sizeof(u32)) {
@@ -2749,8 +2756,12 @@ static int binder_translate_fd_array(struct list_head *pf_head,
 	 */
 	fda_offset = (parent->buffer - (uintptr_t)t->buffer->user_data) +
 		fda->parent_offset;
+<<<<<<< HEAD
 	sender_ufda_base = (void __user *)(uintptr_t)sender_uparent->buffer +
 				fda->parent_offset;
+=======
+	sender_ufda_base = (void __user *)sender_uparent->buffer + fda->parent_offset;
+>>>>>>> 72967f875273 (UPSTREAM: binder: read pre-translated fds from sender buffer)
 
 	if (!IS_ALIGNED((unsigned long)fda_offset, sizeof(u32)) ||
 	    !IS_ALIGNED((unsigned long)sender_ufda_base, sizeof(u32))) {
@@ -3595,8 +3606,13 @@ static void binder_transaction(struct binder_proc *proc,
 				return_error_line = __LINE__;
 				goto err_bad_parent;
 			}
+<<<<<<< HEAD
 			ret = binder_translate_fd_array(&pf_head, fda,
 							user_buffer, parent,
+=======
+			ret = binder_translate_fd_array(fda, user_buffer,
+							parent,
+>>>>>>> 72967f875273 (UPSTREAM: binder: read pre-translated fds from sender buffer)
 							&user_object.bbo, t,
 							thread, in_reply_to);
 			if (!ret)
