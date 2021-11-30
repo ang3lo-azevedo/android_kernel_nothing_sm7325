@@ -1838,9 +1838,21 @@ static size_t binder_get_object(struct binder_proc *proc,
 	size_t object_size = 0;
 
 	read_size = min_t(size_t, sizeof(*object), buffer->data_size - offset);
+<<<<<<< HEAD
 	if (offset > buffer->data_size || read_size < sizeof(*hdr) ||
 	    !IS_ALIGNED(offset, sizeof(u32)))
+=======
+	if (offset > buffer->data_size || read_size < sizeof(*hdr))
+>>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 		return 0;
+	if (u) {
+		if (copy_from_user(object, u + offset, read_size))
+			return 0;
+	} else {
+		if (binder_alloc_copy_from_buffer(&proc->alloc, object, buffer,
+						  offset, read_size))
+			return 0;
+	}
 
 	if (u) {
 		if (copy_from_user(object, u + offset, read_size))
@@ -3060,12 +3072,17 @@ static void binder_transaction(struct binder_proc *proc,
 	char *secctx = NULL;
 	u32 secctx_sz = 0;
 	bool is_nested = false;
+<<<<<<< HEAD
 	struct list_head sgc_head;
 	struct list_head pf_head;
 	const void __user *user_buffer = (const void __user *)
 				(uintptr_t)tr->data.ptr.buffer;
 	INIT_LIST_HEAD(&sgc_head);
 	INIT_LIST_HEAD(&pf_head);
+=======
+	const void __user *user_buffer = (const void __user *)
+				(uintptr_t)tr->data.ptr.buffer;
+>>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 
 	e = binder_transaction_log_add(&binder_transaction_log);
 	e->debug_id = t_debug_id;
@@ -3463,7 +3480,10 @@ static void binder_transaction(struct binder_proc *proc,
 		 */
 		copy_size = object_offset - user_offset;
 		if (copy_size && (user_offset > object_offset ||
+<<<<<<< HEAD
 				object_offset > tr->data_size ||
+=======
+>>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 				binder_alloc_copy_user_to_buffer(
 					&target_proc->alloc,
 					t->buffer, user_offset,
@@ -3589,6 +3609,7 @@ static void binder_transaction(struct binder_proc *proc,
 				return_error_line = __LINE__;
 				goto err_bad_parent;
 			}
+<<<<<<< HEAD
 			/*
 			 * We need to read the user version of the parent
 			 * object to get the original user offset
@@ -3622,6 +3643,17 @@ static void binder_transaction(struct binder_proc *proc,
 								  fda, sizeof(*fda));
 			if (ret) {
 				return_error = BR_FAILED_REPLY;
+=======
+			ret = binder_translate_fd_array(fda, parent, t, thread,
+							in_reply_to);
+			if (!ret)
+				ret = binder_alloc_copy_to_buffer(&target_proc->alloc,
+								  t->buffer,
+								  object_offset,
+								  fda, sizeof(*fda));
+			if (ret) {
+				return_error = BR_FAILED_REPLY;
+>>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 				return_error_param = ret > 0 ? -EINVAL : ret;
 				return_error_line = __LINE__;
 				goto err_translate_failed;
@@ -3701,6 +3733,7 @@ static void binder_transaction(struct binder_proc *proc,
 		return_error_line = __LINE__;
 		goto err_copy_data_failed;
 	}
+<<<<<<< HEAD
 
 	ret = binder_do_deferred_txn_copies(&target_proc->alloc, t->buffer,
 					    &sgc_head, &pf_head);
@@ -3712,6 +3745,8 @@ static void binder_transaction(struct binder_proc *proc,
 		return_error_line = __LINE__;
 		goto err_copy_data_failed;
 	}
+=======
+>>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 	if (t->buffer->oneway_spam_suspect)
 		tcomplete->type = BINDER_WORK_TRANSACTION_ONEWAY_SPAM_SUSPECT;
 	else
