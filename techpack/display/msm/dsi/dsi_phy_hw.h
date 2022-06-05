@@ -13,22 +13,24 @@
 #define DSI_PHY_TIMING_V3_SIZE 12
 #define DSI_PHY_TIMING_V4_SIZE 14
 
-#define DSI_PHY_DBG(p, fmt, ...)	DRM_DEV_DEBUG(NULL, "[msm-dsi-debug]: DSI_%d: "\
-		fmt, p ? p->index : -1, ##__VA_ARGS__)
-#define DSI_PHY_ERR(p, fmt, ...)	DRM_DEV_ERROR(NULL, "[msm-dsi-error]: DSI_%d: "\
-		fmt, p ? p->index : -1, ##__VA_ARGS__)
-#define DSI_PHY_INFO(p, fmt, ...)	DRM_DEV_INFO(NULL, "[msm-dsi-info]: DSI_%d: "\
-		fmt, p ? p->index : -1, ##__VA_ARGS__)
-#define DSI_PHY_WARN(p, fmt, ...)	DRM_WARN("[msm-dsi-warn]: DSI_%d: " fmt,\
-		p ? p->index : -1, ##__VA_ARGS__)
+#define DSI_PHY_DBG(p, fmt, ...)
+#define DSI_PHY_ERR(p, fmt, ...)
+#define DSI_PHY_INFO(p, fmt, ...)
+#define DSI_PHY_WARN(p, fmt, ...)
+
+#ifdef OPLUS_BUG_STABILITY
+#undef DSI_PHY_ERR
+#include <soc/oplus/system/oplus_mm_kevent_fb.h>
+#define DSI_PHY_ERR(p, fmt, ...) \
+	do { \
+		DRM_DEV_ERROR(NULL, "[msm-dsi-error]: DSI_%d: "\
+				fmt, p ? p->index : -1, ##__VA_ARGS__); \
+	} while(0)
+#endif /* OPLUS_BUG_STABILITY */
 
 /**
  * enum dsi_phy_version - DSI PHY version enumeration
  * @DSI_PHY_VERSION_UNKNOWN:    Unknown version.
- * @DSI_PHY_VERSION_0_0_HPM:    28nm-HPM.
- * @DSI_PHY_VERSION_0_0_LPM:    28nm-HPM.
- * @DSI_PHY_VERSION_1_0:        20nm
- * @DSI_PHY_VERSION_2_0:        14nm
  * @DSI_PHY_VERSION_3_0:        10nm
  * @DSI_PHY_VERSION_4_0:        7nm
  * @DSI_PHY_VERSION_4_1:	7nm
@@ -37,10 +39,6 @@
  */
 enum dsi_phy_version {
 	DSI_PHY_VERSION_UNKNOWN,
-	DSI_PHY_VERSION_0_0_HPM, /* 28nm-HPM */
-	DSI_PHY_VERSION_0_0_LPM, /* 28nm-LPM */
-	DSI_PHY_VERSION_1_0, /* 20nm */
-	DSI_PHY_VERSION_2_0, /* 14nm */
 	DSI_PHY_VERSION_3_0, /* 10nm */
 	DSI_PHY_VERSION_4_0, /* 7nm  */
 	DSI_PHY_VERSION_4_1, /* 7nm */
