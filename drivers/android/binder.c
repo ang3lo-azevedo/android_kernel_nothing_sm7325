@@ -4530,6 +4530,7 @@ binder_free_buf(struct binder_proc *proc,
 	trace_binder_transaction_buffer_release(buffer);
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 	binder_release_entire_buffer(proc, thread, buffer, is_failure);
 =======
 	binder_transaction_buffer_release(proc, thread, buffer, 0, false);
@@ -4537,6 +4538,9 @@ binder_free_buf(struct binder_proc *proc,
 =======
 	binder_release_entire_buffer(proc, thread, buffer, is_failure);
 >>>>>>> 6d5e0c7837af (FROMLIST: binder: fix UAF caused by faulty buffer cleanup)
+=======
+	binder_release_entire_buffer(proc, thread, buffer, is_failure);
+>>>>>>> 6c88024cab83 (binder: fix UAF caused by faulty buffer cleanup)
 	binder_alloc_free_buf(&proc->alloc, buffer);
 }
 
