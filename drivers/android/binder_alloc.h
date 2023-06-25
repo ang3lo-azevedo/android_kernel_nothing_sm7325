@@ -122,6 +122,7 @@ static inline void binder_selftest_alloc(struct binder_alloc *alloc) {}
 enum lru_status binder_alloc_free_page(struct list_head *item,
 				       struct list_lru_one *lru,
 				       spinlock_t *lock, void *cb_arg);
+<<<<<<< HEAD
 struct binder_buffer *binder_alloc_new_buf(struct binder_alloc *alloc,
 					   size_t data_size,
 					   size_t offsets_size,
@@ -132,6 +133,18 @@ int binder_alloc_shrinker_init(void);
 void binder_alloc_shrinker_exit(void);
 void binder_alloc_vma_close(struct binder_alloc *alloc);
 struct binder_buffer *
+=======
+extern struct binder_buffer *binder_alloc_new_buf(struct binder_alloc *alloc,
+						  size_t data_size,
+						  size_t offsets_size,
+						  size_t extra_buffers_size,
+						  int is_async);
+extern void binder_alloc_init(struct binder_alloc *alloc);
+extern int binder_alloc_shrinker_init(void);
+extern void binder_alloc_shrinker_exit(void);
+extern void binder_alloc_vma_close(struct binder_alloc *alloc);
+extern struct binder_buffer *
+>>>>>>> b97dad01c121 (binder: fix memory leak in binder_init())
 binder_alloc_prepare_to_free(struct binder_alloc *alloc,
 			     unsigned long user_ptr);
 void binder_alloc_free_buf(struct binder_alloc *alloc,
