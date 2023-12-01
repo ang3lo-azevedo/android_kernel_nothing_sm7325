@@ -328,6 +328,47 @@ static void binder_lru_freelist_del(struct binder_alloc *alloc,
 		if (index + 1 > alloc->pages_high)
 			alloc->pages_high = index + 1;
 	}
+<<<<<<< HEAD
+=======
+	if (mm) {
+		up_write(&mm->mmap_sem);
+		mmput_async(mm);
+	}
+	return 0;
+
+free_range:
+	for (page_addr = end - PAGE_SIZE; 1; page_addr -= PAGE_SIZE) {
+		bool ret;
+		size_t index;
+
+		index = (page_addr - alloc->buffer) / PAGE_SIZE;
+		page = &alloc->pages[index];
+
+		trace_binder_free_lru_start(alloc, index);
+
+		ret = list_lru_add(&binder_alloc_lru, &page->lru);
+		WARN_ON(!ret);
+
+		trace_binder_free_lru_end(alloc, index);
+		if (page_addr == start)
+			break;
+		continue;
+
+err_vm_insert_page_failed:
+		__free_page(page->page_ptr);
+		page->page_ptr = NULL;
+err_alloc_page_failed:
+err_page_ptr_cleared:
+		if (page_addr == start)
+			break;
+	}
+err_no_vma:
+	if (mm) {
+		up_write(&mm->mmap_sem);
+		mmput_async(mm);
+	}
+	return vma ? -ENOMEM : -ESRCH;
+>>>>>>> 252a2a5569eb (binder: fix race between mmput() and do_exit())
 }
 
 static inline void binder_alloc_set_vma(struct binder_alloc *alloc,
