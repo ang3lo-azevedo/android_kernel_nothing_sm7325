@@ -463,6 +463,36 @@ static struct binder_buffer *binder_alloc_new_buf_locked(
 	unsigned long curr_last_page;
 	size_t buffer_size;
 
+<<<<<<< HEAD
+=======
+	if (!binder_alloc_get_vma(alloc)) {
+		binder_alloc_debug(BINDER_DEBUG_USER_ERROR,
+				   "%d: binder_alloc_buf, no vma\n",
+				   alloc->pid);
+		return ERR_PTR(-ESRCH);
+	}
+
+	data_offsets_size = ALIGN(data_size, sizeof(void *)) +
+		ALIGN(offsets_size, sizeof(void *));
+
+	if (data_offsets_size < data_size || data_offsets_size < offsets_size) {
+		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC,
+				"%d: got transaction with invalid size %zd-%zd\n",
+				alloc->pid, data_size, offsets_size);
+		return ERR_PTR(-EINVAL);
+	}
+	size = data_offsets_size + ALIGN(extra_buffers_size, sizeof(void *));
+	if (size < data_offsets_size || size < extra_buffers_size) {
+		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC,
+				"%d: got transaction with invalid extra_buffers_size %zd\n",
+				alloc->pid, extra_buffers_size);
+		return ERR_PTR(-EINVAL);
+	}
+
+	/* Pad 0-size buffers so they get assigned unique addresses */
+	size = max(size, sizeof(void *));
+
+>>>>>>> 5c3d4930c7b7 (binder: fix unused alloc->free_async_space)
 	if (is_async && alloc->free_async_space < size) {
 		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC,
 			     "%d: binder_alloc_buf size %zd failed, no async space left\n",
@@ -721,11 +751,15 @@ static void binder_free_buf_locked(struct binder_alloc *alloc,
 
 	if (buffer->async_transaction) {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		alloc->free_async_space += buffer_size;
 =======
 		alloc->free_async_space += buffer_size + sizeof(struct binder_buffer);
 
 >>>>>>> 7aedba616cb4 (UPSTREAM: binder: fix async_free_space accounting for empty parcels)
+=======
+		alloc->free_async_space += buffer_size;
+>>>>>>> 5c3d4930c7b7 (binder: fix unused alloc->free_async_space)
 		binder_alloc_debug(BINDER_DEBUG_BUFFER_ALLOC_ASYNC,
 			     "%d: binder_free_buf size %zd async free %zd\n",
 			      alloc->pid, size, alloc->free_async_space);
