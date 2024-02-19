@@ -218,6 +218,7 @@ static int cass_best_cpu(struct task_struct *p, int prev_cpu, bool sync, bool rt
 		if (cpu != task_cpu(p))
 			curr->util += p_util;
 
+<<<<<<< HEAD
 		/*
 		 * Calculate the effective utilization for this CPU candidate;
 		 * i.e., the utilization calculated by the CPU governor. This is
@@ -227,10 +228,13 @@ static int cass_best_cpu(struct task_struct *p, int prev_cpu, bool sync, bool rt
 		 */
 		curr->eff_util = max(curr->util + curr->hard_util, uc_min);
 
+=======
+>>>>>>> 0437d9bf45dd4a (sched/cass: Fix suboptimal task placement when uclamp is used)
 		/* Clamp the utilization to the minimum performance threshold */
 		if (curr->util < uc_min)
 			curr->util = uc_min;
 
+<<<<<<< HEAD
 		/*
 		 * Calculate the relative utilization for this CPU candidate
 		 * without thermal pressure included. Thermal pressure needs to
@@ -246,6 +250,10 @@ static int cass_best_cpu(struct task_struct *p, int prev_cpu, bool sync, bool rt
 		 */
 		curr->util =
 			curr->util * SCHED_CAPACITY_SCALE / curr->cap;
+=======
+		/* Calculate the relative utilization for this CPU candidate */
+		curr->util = curr->util * SCHED_CAPACITY_SCALE / curr->cap;
+>>>>>>> 0437d9bf45dd4a (sched/cass: Fix suboptimal task placement when uclamp is used)
 
 		/*
 		 * Check if this CPU is better than the best CPU found so far.
