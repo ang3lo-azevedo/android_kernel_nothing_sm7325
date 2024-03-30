@@ -2031,12 +2031,18 @@ static size_t binder_get_object(struct binder_proc *proc,
 
 	read_size = min_t(size_t, sizeof(*object), buffer->data_size - offset);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if (offset > buffer->data_size || read_size < sizeof(*hdr) ||
 	    !IS_ALIGNED(offset, sizeof(u32)))
 =======
 	if (offset > buffer->data_size || read_size < sizeof(*hdr))
 >>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
+=======
+	if (offset > buffer->data_size || read_size < sizeof(*hdr) ||
+	    !IS_ALIGNED(offset, sizeof(u32)))
+>>>>>>> 66f4b04cb072 (FROMLIST: binder: check offset alignment in binder_get_object())
 		return 0;
+
 	if (u) {
 		if (copy_from_user(object, u + offset, read_size))
 			return 0;
