@@ -516,8 +516,12 @@ struct binder_proc {
 	struct list_head todo;
 	struct binder_stats stats;
 	struct list_head delivered_death;
+<<<<<<< HEAD
 	struct list_head delivered_freeze;
 	int max_threads;
+=======
+	u32 max_threads;
+>>>>>>> 11ac2a045473 (binder: fix max_thread type inconsistency)
 	int requested_threads;
 	int requested_threads_started;
 	int tmp_ref;
