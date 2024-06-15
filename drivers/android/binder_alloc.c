@@ -36,7 +36,7 @@ enum {
 	BINDER_DEBUG_BUFFER_ALLOC           = 1U << 2,
 	BINDER_DEBUG_BUFFER_ALLOC_ASYNC     = 1U << 3,
 };
-static uint32_t binder_alloc_debug_mask = 0;
+static uint32_t binder_alloc_debug_mask = BINDER_DEBUG_USER_ERROR;
 
 module_param_named(debug_mask, binder_alloc_debug_mask,
 		   uint, 0644);
@@ -762,11 +762,14 @@ static void binder_alloc_clear_buf(struct binder_alloc *alloc,
 		unsigned long size;
 		struct page *page;
 		pgoff_t pgoff;
+		void *kptr;
 
 		page = binder_alloc_get_page(alloc, buffer,
 					     buffer_offset, &pgoff);
 		size = min_t(size_t, bytes, PAGE_SIZE - pgoff);
-		memset_page(page, pgoff, 0, size);
+		kptr = kmap(page) + pgoff;
+		memset(kptr, 0, size);
+		kunmap(page);
 		bytes -= size;
 		buffer_offset += size;
 	}
@@ -838,9 +841,9 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 
 	alloc->buffer = (void __user *)vma->vm_start;
 
-	alloc->pages = kvcalloc(alloc->buffer_size / PAGE_SIZE,
-				sizeof(alloc->pages[0]),
-				GFP_KERNEL);
+	alloc->pages = kcalloc(alloc->buffer_size / PAGE_SIZE,
+			       sizeof(alloc->pages[0]),
+			       GFP_KERNEL);
 	if (alloc->pages == NULL) {
 		ret = -ENOMEM;
 		failure_string = "alloc page array";
@@ -871,7 +874,7 @@ int binder_alloc_mmap_handler(struct binder_alloc *alloc,
 	return 0;
 
 err_alloc_buf_struct_failed:
-	kvfree(alloc->pages);
+	kfree(alloc->pages);
 	alloc->pages = NULL;
 err_alloc_pages_failed:
 	alloc->buffer = NULL;
@@ -943,7 +946,7 @@ void binder_alloc_deferred_release(struct binder_alloc *alloc)
 			__free_page(alloc->pages[i].page_ptr);
 			page_count++;
 		}
-		kvfree(alloc->pages);
+		kfree(alloc->pages);
 	}
 	spin_unlock(&alloc->lock);
 	if (alloc->vma_vm_mm)
@@ -1241,9 +1244,9 @@ binder_alloc_copy_user_to_buffer(struct binder_alloc *alloc,
 		page = binder_alloc_get_page(alloc, buffer,
 					     buffer_offset, &pgoff);
 		size = min_t(size_t, bytes, PAGE_SIZE - pgoff);
-		kptr = kmap_local_page(page) + pgoff;
+		kptr = kmap(page) + pgoff;
 		ret = copy_from_user(kptr, from, size);
-		kunmap_local(kptr);
+		kunmap(page);
 		if (ret)
 			return bytes - size + ret;
 		bytes -= size;
@@ -1268,14 +1271,23 @@ static int binder_alloc_do_buffer_copy(struct binder_alloc *alloc,
 		unsigned long size;
 		struct page *page;
 		pgoff_t pgoff;
+		void *tmpptr;
+		void *base_ptr;
 
 		page = binder_alloc_get_page(alloc, buffer,
 					     buffer_offset, &pgoff);
 		size = min_t(size_t, bytes, PAGE_SIZE - pgoff);
+		base_ptr = kmap_atomic(page);
+		tmpptr = base_ptr + pgoff;
 		if (to_buffer)
-			memcpy_to_page(page, pgoff, ptr, size);
+			memcpy(tmpptr, ptr, size);
 		else
-			memcpy_from_page(ptr, page, pgoff, size);
+			memcpy(ptr, tmpptr, size);
+		/*
+		 * kunmap_atomic() takes care of flushing the cache
+		 * if this device has VIVT cache arch
+		 */
+		kunmap_atomic(base_ptr);
 		bytes -= size;
 		pgoff = 0;
 		ptr = ptr + size;
