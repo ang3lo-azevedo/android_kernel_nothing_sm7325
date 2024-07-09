@@ -499,6 +499,9 @@ enum binder_driver_return_protocol {
 	 * detection threshold.  No parameters.
 	 */
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 
 	BR_FROZEN_BINDER = _IOR('r', 21, struct binder_frozen_state_info),
 	/*
@@ -510,8 +513,11 @@ enum binder_driver_return_protocol {
 	/*
 	 * void *: cookie
 	 */
+<<<<<<< HEAD
 =======
 >>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
+=======
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 };
 
 enum binder_driver_command_protocol {

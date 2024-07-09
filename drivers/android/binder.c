@@ -4101,6 +4101,10 @@ binder_request_freeze_notification(struct binder_proc *proc,
 {
 	struct binder_ref_freeze *freeze;
 	struct binder_ref *ref;
+<<<<<<< HEAD
+=======
+	bool is_frozen;
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 
 	freeze = kzalloc(sizeof(*freeze), GFP_KERNEL);
 	if (!freeze)
@@ -4116,14 +4120,23 @@ binder_request_freeze_notification(struct binder_proc *proc,
 	}
 
 	binder_node_lock(ref->node);
+<<<<<<< HEAD
 	if (ref->freeze) {
 		binder_user_error("%d:%d BC_REQUEST_FREEZE_NOTIFICATION already set\n",
 				  proc->pid, thread->pid);
+=======
+
+	if (ref->freeze || !ref->node->proc) {
+		binder_user_error("%d:%d invalid BC_REQUEST_FREEZE_NOTIFICATION %s\n",
+				  proc->pid, thread->pid,
+				  ref->freeze ? "already set" : "dead node");
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 		binder_node_unlock(ref->node);
 		binder_proc_unlock(proc);
 		kfree(freeze);
 		return -EINVAL;
 	}
+<<<<<<< HEAD
 
 	INIT_LIST_HEAD(&freeze->work.entry);
 	freeze->cookie = handle_cookie->cookie;
@@ -4140,6 +4153,24 @@ binder_request_freeze_notification(struct binder_proc *proc,
 		binder_wakeup_proc_ilocked(proc);
 		binder_inner_proc_unlock(proc);
 	}
+=======
+	binder_inner_proc_lock(ref->node->proc);
+	is_frozen = ref->node->proc->is_frozen;
+	binder_inner_proc_unlock(ref->node->proc);
+
+	binder_stats_created(BINDER_STAT_FREEZE);
+	INIT_LIST_HEAD(&freeze->work.entry);
+	freeze->cookie = handle_cookie->cookie;
+	freeze->work.type = BINDER_WORK_FROZEN_BINDER;
+	freeze->is_frozen = is_frozen;
+
+	ref->freeze = freeze;
+
+	binder_inner_proc_lock(proc);
+	binder_enqueue_work_ilocked(&ref->freeze->work, &proc->todo);
+	binder_wakeup_proc_ilocked(proc);
+	binder_inner_proc_unlock(proc);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 
 	binder_node_unlock(ref->node);
 	binder_proc_unlock(proc);
@@ -4214,7 +4245,11 @@ binder_freeze_notification_done(struct binder_proc *proc,
 	struct binder_work *w;
 
 	binder_inner_proc_lock(proc);
+<<<<<<< HEAD
 	list_for_each_entry(w, &proc_wrapper(proc)->delivered_freeze, entry) {
+=======
+	list_for_each_entry(w, &proc->delivered_freeze, entry) {
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 		struct binder_ref_freeze *tmp_freeze =
 			container_of(w, struct binder_ref_freeze, work);
 
@@ -5163,7 +5198,11 @@ retry:
 			info.is_frozen = freeze->is_frozen;
 			info.cookie = freeze->cookie;
 			freeze->sent = true;
+<<<<<<< HEAD
 			binder_enqueue_work_ilocked(w, &proc_wrapper(proc)->delivered_freeze);
+=======
+			binder_enqueue_work_ilocked(w, &proc->delivered_freeze);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 			binder_inner_proc_unlock(proc);
 
 			if (put_user(BR_FROZEN_BINDER, (uint32_t __user *)ptr))
@@ -5183,6 +5222,10 @@ retry:
 
 			binder_inner_proc_unlock(proc);
 			kfree(freeze);
+<<<<<<< HEAD
+=======
+			binder_stats_deleted(BINDER_STAT_FREEZE);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 			if (put_user(BR_CLEAR_FREEZE_NOTIFICATION_DONE, (uint32_t __user *)ptr))
 				return -EFAULT;
 			ptr += sizeof(uint32_t);
@@ -5829,7 +5872,10 @@ static bool binder_txns_pending_ilocked(struct binder_proc *proc)
 
 static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 {
+<<<<<<< HEAD
 	struct binder_node *prev = NULL;
+=======
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 	struct rb_node *n;
 	struct binder_ref *ref;
 
@@ -5838,10 +5884,14 @@ static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 		struct binder_node *node;
 
 		node = rb_entry(n, struct binder_node, rb_node);
+<<<<<<< HEAD
 		binder_inc_node_tmpref_ilocked(node);
 		binder_inner_proc_unlock(proc);
 		if (prev)
 			binder_put_node(prev);
+=======
+		binder_inner_proc_unlock(proc);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 		binder_node_lock(node);
 		hlist_for_each_entry(ref, &node->refs, node_entry) {
 			/*
@@ -5867,6 +5917,7 @@ static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 			}
 			binder_inner_proc_unlock(ref->proc);
 		}
+<<<<<<< HEAD
 		prev = node;
 		binder_node_unlock(node);
 		binder_inner_proc_lock(proc);
@@ -5876,6 +5927,12 @@ static void binder_add_freeze_work(struct binder_proc *proc, bool is_frozen)
 	binder_inner_proc_unlock(proc);
 	if (prev)
 		binder_put_node(prev);
+=======
+		binder_node_unlock(node);
+		binder_inner_proc_lock(proc);
+	}
+	binder_inner_proc_unlock(proc);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 }
 
 static int binder_ioctl_freeze(struct binder_freeze_info *info,
@@ -6305,7 +6362,11 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	binder_stats_created(BINDER_STAT_PROC);
 	proc->pid = current->group_leader->pid;
 	INIT_LIST_HEAD(&proc->delivered_death);
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&proc_wrapper(proc)->delivered_freeze);
+=======
+	INIT_LIST_HEAD(&proc->delivered_freeze);
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 	INIT_LIST_HEAD(&proc->waiting_threads);
 	filp->private_data = proc;
 
@@ -6918,8 +6979,14 @@ static const char * const binder_return_strings[] = {
 	"BR_FROZEN_REPLY",
 <<<<<<< HEAD
 	"BR_ONEWAY_SPAM_SUSPECT",
+<<<<<<< HEAD
 =======
 >>>>>>> a4e84758f029 (UPSTREAM: binder: fix the missing BR_FROZEN_REPLY in binder_return_strings)
+=======
+	"UNSUPPORTED",
+	"BR_FROZEN_BINDER",
+	"BR_CLEAR_FREEZE_NOTIFICATION_DONE",
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 };
 
 static const char * const binder_command_strings[] = {
@@ -6942,6 +7009,9 @@ static const char * const binder_command_strings[] = {
 	"BC_DEAD_BINDER_DONE",
 	"BC_TRANSACTION_SG",
 	"BC_REPLY_SG",
+	"BC_REQUEST_FREEZE_NOTIFICATION",
+	"BC_CLEAR_FREEZE_NOTIFICATION",
+	"BC_FREEZE_NOTIFICATION_DONE",
 };
 
 static const char * const binder_objstat_strings[] = {
@@ -6952,6 +7022,10 @@ static const char * const binder_objstat_strings[] = {
 	"death",
 	"transaction",
 	"transaction_complete",
+<<<<<<< HEAD
+=======
+	"freeze",
+>>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 };
 
 static void print_binder_stats(struct seq_file *m, const char *prefix,
