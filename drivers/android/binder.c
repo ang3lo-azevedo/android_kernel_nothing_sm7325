@@ -3741,12 +3741,16 @@ static void binder_transaction(struct binder_proc *proc,
 		if (copy_size && (user_offset > object_offset ||
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 				object_offset > tr->data_size ||
 =======
 >>>>>>> b007cadee64a (UPSTREAM: binder: avoid potential data leakage when copying txn)
 =======
 				object_offset > tr->data_size ||
 >>>>>>> f4e5b5151e55 (FROMLIST: binder: fix UAF caused by offsets overwrite)
+=======
+				object_offset > tr->data_size ||
+>>>>>>> 5a32bfd23022 (binder: fix UAF caused by offsets overwrite)
 				binder_alloc_copy_user_to_buffer(
 					&target_proc->alloc,
 					t->buffer, user_offset,
