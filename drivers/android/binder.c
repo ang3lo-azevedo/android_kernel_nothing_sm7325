@@ -4254,7 +4254,6 @@ binder_request_freeze_notification(struct binder_proc *proc,
 =======
 >>>>>>> 00553a4558bb (FROMGIT: binder: allow freeze notification for dead nodes)
 
-	binder_stats_created(BINDER_STAT_FREEZE);
 	INIT_LIST_HEAD(&freeze->work.entry);
 	freeze->cookie = handle_cookie->cookie;
 	freeze->work.type = BINDER_WORK_FROZEN_BINDER;
@@ -4353,10 +4352,14 @@ binder_freeze_notification_done(struct binder_proc *proc,
 
 	binder_inner_proc_lock(proc);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	list_for_each_entry(w, &proc_wrapper(proc)->delivered_freeze, entry) {
 =======
 	list_for_each_entry(w, &proc->delivered_freeze, entry) {
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+	list_for_each_entry(w, &proc_wrapper(proc)->delivered_freeze, entry) {
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 		struct binder_ref_freeze *tmp_freeze =
 			container_of(w, struct binder_ref_freeze, work);
 
@@ -5322,10 +5325,14 @@ retry:
 			info.cookie = freeze->cookie;
 			freeze->sent = true;
 <<<<<<< HEAD
+<<<<<<< HEAD
 			binder_enqueue_work_ilocked(w, &proc_wrapper(proc)->delivered_freeze);
 =======
 			binder_enqueue_work_ilocked(w, &proc->delivered_freeze);
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+			binder_enqueue_work_ilocked(w, &proc_wrapper(proc)->delivered_freeze);
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 			binder_inner_proc_unlock(proc);
 
 			if (put_user(BR_FROZEN_BINDER, (uint32_t __user *)ptr))
@@ -5346,9 +5353,12 @@ retry:
 			binder_inner_proc_unlock(proc);
 			kfree(freeze);
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 			binder_stats_deleted(BINDER_STAT_FREEZE);
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 			if (put_user(BR_CLEAR_FREEZE_NOTIFICATION_DONE, (uint32_t __user *)ptr))
 				return -EFAULT;
 			ptr += sizeof(uint32_t);
@@ -6556,10 +6566,14 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	proc->pid = current->group_leader->pid;
 	INIT_LIST_HEAD(&proc->delivered_death);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	INIT_LIST_HEAD(&proc_wrapper(proc)->delivered_freeze);
 =======
 	INIT_LIST_HEAD(&proc->delivered_freeze);
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+	INIT_LIST_HEAD(&proc_wrapper(proc)->delivered_freeze);
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 	INIT_LIST_HEAD(&proc->waiting_threads);
 	filp->private_data = proc;
 
@@ -7180,6 +7194,7 @@ static const char * const binder_return_strings[] = {
 <<<<<<< HEAD
 	"BR_ONEWAY_SPAM_SUSPECT",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> a4e84758f029 (UPSTREAM: binder: fix the missing BR_FROZEN_REPLY in binder_return_strings)
 =======
@@ -7190,6 +7205,8 @@ static const char * const binder_return_strings[] = {
 =======
 	"BR_ONEWAY_SPAM_SUSPECT",
 >>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
+=======
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 };
 
 static const char * const binder_command_strings[] = {
@@ -7212,9 +7229,6 @@ static const char * const binder_command_strings[] = {
 	"BC_DEAD_BINDER_DONE",
 	"BC_TRANSACTION_SG",
 	"BC_REPLY_SG",
-	"BC_REQUEST_FREEZE_NOTIFICATION",
-	"BC_CLEAR_FREEZE_NOTIFICATION",
-	"BC_FREEZE_NOTIFICATION_DONE",
 };
 
 static const char * const binder_objstat_strings[] = {
@@ -7226,9 +7240,12 @@ static const char * const binder_objstat_strings[] = {
 	"transaction",
 	"transaction_complete",
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	"freeze",
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+>>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 };
 
 static void print_binder_stats(struct seq_file *m, const char *prefix,
