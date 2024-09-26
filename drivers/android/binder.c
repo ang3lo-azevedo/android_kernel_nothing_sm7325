@@ -4105,9 +4105,12 @@ binder_request_freeze_notification(struct binder_proc *proc,
 	struct binder_ref_freeze *freeze;
 	struct binder_ref *ref;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 	bool is_frozen;
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+>>>>>>> 00553a4558bb (FROMGIT: binder: allow freeze notification for dead nodes)
 
 	freeze = kzalloc(sizeof(*freeze), GFP_KERNEL);
 	if (!freeze)
@@ -4124,6 +4127,7 @@ binder_request_freeze_notification(struct binder_proc *proc,
 
 	binder_node_lock(ref->node);
 <<<<<<< HEAD
+<<<<<<< HEAD
 	if (ref->freeze) {
 		binder_user_error("%d:%d BC_REQUEST_FREEZE_NOTIFICATION already set\n",
 				  proc->pid, thread->pid);
@@ -4134,11 +4138,17 @@ binder_request_freeze_notification(struct binder_proc *proc,
 				  proc->pid, thread->pid,
 				  ref->freeze ? "already set" : "dead node");
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+	if (ref->freeze) {
+		binder_user_error("%d:%d BC_REQUEST_FREEZE_NOTIFICATION already set\n",
+				  proc->pid, thread->pid);
+>>>>>>> 00553a4558bb (FROMGIT: binder: allow freeze notification for dead nodes)
 		binder_node_unlock(ref->node);
 		binder_proc_unlock(proc);
 		kfree(freeze);
 		return -EINVAL;
 	}
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 	INIT_LIST_HEAD(&freeze->work.entry);
@@ -4160,20 +4170,33 @@ binder_request_freeze_notification(struct binder_proc *proc,
 	binder_inner_proc_lock(ref->node->proc);
 	is_frozen = ref->node->proc->is_frozen;
 	binder_inner_proc_unlock(ref->node->proc);
+=======
+>>>>>>> 00553a4558bb (FROMGIT: binder: allow freeze notification for dead nodes)
 
 	binder_stats_created(BINDER_STAT_FREEZE);
 	INIT_LIST_HEAD(&freeze->work.entry);
 	freeze->cookie = handle_cookie->cookie;
 	freeze->work.type = BINDER_WORK_FROZEN_BINDER;
-	freeze->is_frozen = is_frozen;
-
 	ref->freeze = freeze;
 
+<<<<<<< HEAD
 	binder_inner_proc_lock(proc);
 	binder_enqueue_work_ilocked(&ref->freeze->work, &proc->todo);
 	binder_wakeup_proc_ilocked(proc);
 	binder_inner_proc_unlock(proc);
 >>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
+=======
+	if (ref->node->proc) {
+		binder_inner_proc_lock(ref->node->proc);
+		freeze->is_frozen = ref->node->proc->is_frozen;
+		binder_inner_proc_unlock(ref->node->proc);
+
+		binder_inner_proc_lock(proc);
+		binder_enqueue_work_ilocked(&freeze->work, &proc->todo);
+		binder_wakeup_proc_ilocked(proc);
+		binder_inner_proc_unlock(proc);
+	}
+>>>>>>> 00553a4558bb (FROMGIT: binder: allow freeze notification for dead nodes)
 
 	binder_node_unlock(ref->node);
 	binder_proc_unlock(proc);
