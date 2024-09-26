@@ -5400,6 +5400,9 @@ static void binder_release_work(struct binder_proc *proc,
 		case BINDER_WORK_NODE:
 			break;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> d7f2e2600fce (BACKPORT: FROMGIT: binder: fix memleak of proc->delivered_freeze)
 		case BINDER_WORK_CLEAR_FREEZE_NOTIFICATION: {
 			struct binder_ref_freeze *freeze;
 
@@ -5409,8 +5412,11 @@ static void binder_release_work(struct binder_proc *proc,
 				     (u64)freeze->cookie);
 			kfree(freeze);
 		} break;
+<<<<<<< HEAD
 =======
 >>>>>>> 8d3d29f0729a (UPSTREAM: binder: fix UAF when releasing todo list)
+=======
+>>>>>>> d7f2e2600fce (BACKPORT: FROMGIT: binder: fix memleak of proc->delivered_freeze)
 		default:
 			pr_err("unexpected work type, %d, not freed\n",
 			       wtype);
