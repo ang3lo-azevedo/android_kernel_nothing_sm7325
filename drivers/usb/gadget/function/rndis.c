@@ -63,7 +63,7 @@ MODULE_PARM_DESC (rndis_debug, "enable debugging");
 
 static DEFINE_IDA(rndis_ida);
 
-static DEFINE_SPINLOCK(resp_lock);
+static spinlock_t resp_lock __attribute__((unused)) = __SPIN_LOCK_UNLOCKED(resp_lock);
 
 /* Driver Version */
 static const __le32 rndis_driver_version = cpu_to_le32(1);
