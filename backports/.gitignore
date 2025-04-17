@@ -1,3 +1,27 @@
+<<<<<<< HEAD
 *~
 *pyc
 output/
+=======
+Kconfig.kernel
+Kconfig.versions
+.kernel_config_md5
+.config
+.config.old
+*~
+*.o
+*.d
+.tmp_*
+*.ko
+*.cmd
+*.tmp
+*.ver
+*.mod
+modules.order
+backport-include/backport/autoconf.h
+modules
+.tmp_versions
+Module.symvers
+*.mod.c
+.cache.mk
+>>>>>>> 089700b8c1c2f3 (fp5: import backported bluetooth stack from 5.15)
