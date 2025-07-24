@@ -2026,6 +2026,12 @@ ol_txrx_vdev_attach(struct cdp_soc_t *soc_hdl, uint8_t pdev_id,
 	if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam())
 		pdev->monitor_vdev = vdev;
 
+	if (QDF_GLOBAL_MONITOR_MODE == cds_get_conparam() &&
+	    vdev == pdev->monitor_vdev) {
+		vdev->prio_q_paused = 0;
+		qdf_atomic_set(&vdev->os_q_paused, 0);
+	}
+
 	ol_txrx_hl_tdls_flag_reset(soc_hdl, vdev_id, false);
 
 	ol_txrx_dbg(
