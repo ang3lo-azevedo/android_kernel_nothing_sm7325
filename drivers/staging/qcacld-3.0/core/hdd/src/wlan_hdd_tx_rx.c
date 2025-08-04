@@ -1307,6 +1307,14 @@ netdev_tx_t hdd_hard_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
 		return NETDEV_TX_OK;
 	}
 
+	/* Adding a check for monitor mode */
+	if (cds_get_conparam() == QDF_GLOBAL_MONITOR_MODE) {
+		pr_info("Monitor mode: sending packet directly\n");
+		__hdd_hard_start_xmit(skb, net_dev);
+		osif_vdev_sync_op_stop(vdev_sync);
+		return NETDEV_TX_OK;
+	}
+
 	__hdd_hard_start_xmit(skb, net_dev);
 
 	osif_vdev_sync_op_stop(vdev_sync);
