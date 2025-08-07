@@ -24925,7 +24925,13 @@ static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
 		hdd_err_rl("failed to reinit monitor mode vdev up event");
 		return qdf_status_to_os_return(status);
 	}
+
+	/* Add appropriate locking here to synchronize channel switching
+	* with packet capture.
+	*/
+	qdf_spin_lock_bh(&adapter->vdev_lock);
 	adapter->monitor_mode_vdev_up_in_progress = true;
+	qdf_spin_unlock_bh(&adapter->vdev_lock);
 
 	status = sme_roam_channel_change_req(mac_handle, bssid,
 					     &roam_profile.ch_params,
@@ -24933,7 +24939,12 @@ static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
 	if (status) {
 		hdd_err_rl("Failed to set sme_RoamChannel for monitor mode status: %d",
 			   status);
+
+		/* Release lock here */
+		qdf_spin_lock_bh(&adapter->vdev_lock);
 		adapter->monitor_mode_vdev_up_in_progress = false;
+		qdf_spin_unlock_bh(&adapter->vdev_lock);
+
 		ret = qdf_status_to_os_return(status);
 		return ret;
 	}
@@ -24957,9 +24968,18 @@ static int __wlan_hdd_cfg80211_set_mon_ch(struct wiphy *wiphy,
 			hdd_err_rl("Failed monitor mode vdev up(status-%d)",
 				  status);
 
+		/* Release lock here */
+		qdf_spin_lock_bh(&adapter->vdev_lock);
 		adapter->monitor_mode_vdev_up_in_progress = false;
+		qdf_spin_unlock_bh(&adapter->vdev_lock);
+
 		return qdf_status_to_os_return(status);
 	}
+
+	/* Release lock here */
+	qdf_spin_lock_bh(&adapter->vdev_lock);
+	adapter->monitor_mode_vdev_up_in_progress = false;
+	qdf_spin_unlock_bh(&adapter->vdev_lock);
 
 	hdd_exit();
 
