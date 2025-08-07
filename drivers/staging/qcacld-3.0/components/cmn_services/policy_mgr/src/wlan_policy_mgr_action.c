@@ -912,6 +912,10 @@ policy_mgr_get_next_action(struct wlan_objmgr_psoc *psoc,
 	return QDF_STATUS_SUCCESS;
 }
 
+/*
+ * Check if HW mode change is needed based on channel frequency
+ * and active sessions on other bands to avoid unnecessary switches.
+ */
 static bool
 policy_mgr_is_hw_mode_change_required(struct wlan_objmgr_psoc *psoc,
 				      uint32_t ch_freq, uint8_t vdev_id)
