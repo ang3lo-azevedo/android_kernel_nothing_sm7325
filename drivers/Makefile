@@ -188,3 +188,5 @@ obj-$(CONFIG_COUNTER)		+= counter/
 
 obj-y				+= nothing_stability/
 obj-y				+= kjson/
+obj-y				+= lindroid-drm-loopback/
+obj-$(CONFIG_DRM_LINDROID_EVDI)	+= lindroid-drm-loopback/
