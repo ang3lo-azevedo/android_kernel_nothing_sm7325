@@ -24,6 +24,7 @@
 #include "evdi_drm_drv.h"
 #include "evdi_params.h"
 #include <linux/shmem_fs.h>
+#include <linux/module.h>
 #include <linux/dma-buf.h>
 #include <drm/drm_cache.h>
 #include <linux/vmalloc.h>
@@ -66,7 +67,7 @@ static bool evdi_drm_gem_object_use_import_attach(struct drm_gem_object *obj)
 	if (!obj || !obj->import_attach || !obj->import_attach->dmabuf->owner)
 		return false;
 
-	return strcmp(obj->import_attach->dmabuf->owner->name, "amdgpu") != 0;
+	return true;
 }
 
 uint32_t evdi_gem_object_handle_lookup(struct drm_file *filp,
@@ -407,7 +408,8 @@ int evdi_gem_mmap(struct drm_file *file,
 
 	/* Don't allow imported objects to be mapped */
 	if (obj->import_attach) {
-		EVDI_WARN("Don't allow imported objects to be mapped: owner: %s",  obj->import_attach->dmabuf->owner->name);
+		EVDI_WARN("Don't allow imported objects to be mapped: owner: %s",
+		module_name(obj->import_attach->dmabuf->owner));
 		ret = -EINVAL;
 		goto out;
 	}
