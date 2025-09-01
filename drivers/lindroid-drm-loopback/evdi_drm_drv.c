@@ -279,7 +279,8 @@ int evdi_get_buff_callback_ioctl(struct drm_device *drm_dev, void *data,
 	copy_from_user(gralloc_buf->data_ints, cmd->data_ints, sizeof(int) * cmd->numInts);
 	int *fd_ints = kzalloc(sizeof(int)*cmd->numFds, GFP_KERNEL);
 	copy_from_user(fd_ints, cmd->fd_ints, sizeof(int) * cmd->numFds);
-	for(int i = 0; i < cmd->numFds; i++) {
+	int i;
+	for (i = 0; i < cmd->numFds; i++) {
 		gralloc_buf->data_files[i] = fget(fd_ints[i]);
 		if (!gralloc_buf->data_files[i]) {
 			printk("evdi_get_buff_callback_ioctl: Failed to open fake fb %d\n", cmd->fd_ints[i]);
@@ -379,7 +380,8 @@ int evdi_gbm_add_buf_ioctl(struct drm_device *dev, void *data,
 	add_gralloc_buf->data_files = kzalloc(sizeof(struct file*)*numFds, GFP_KERNEL);
 	add_gralloc_buf->memfd_file = memfd_file;
 
-	for(int i = 0; i < numFds; i++) {
+	int i;
+	for(i = 0; i < numFds; i++) {
 		bytes_read = kernel_read(memfd_file, &fd, sizeof(fd), &pos);
 		if (bytes_read != sizeof(fd)) {
 			printk("Failed to read fd from memfd, bytes_read=%zd\n", bytes_read);
@@ -464,7 +466,8 @@ int evdi_gbm_get_buf_ioctl(struct drm_device *dev, void *data,
 	gralloc_buf->numInts = gralloc_buf_tmp->numInts;
 	memcpy(&gralloc_buf->data[gralloc_buf->numFds], gralloc_buf_tmp->data_ints, sizeof(int)*gralloc_buf->numInts);
 
-	for(int i = 0; i < gralloc_buf->numFds; i++) {
+	int i;
+	for(i = 0; i < gralloc_buf->numFds; i++) {
 		fd_tmp = get_unused_fd_flags(O_RDWR);
 		fd_install(fd_tmp, gralloc_buf_tmp->data_files[i]);
 		gralloc_buf->data[i] = fd_tmp;
@@ -603,7 +606,8 @@ int evdi_poll_ioctl(struct drm_device *drm_dev, void *data,
 
 			fd_install(fd, add_gralloc_buf->memfd_file);
 
-			for(int i = 0; i < add_gralloc_buf->numFds; i++) {
+			int i;
+			for(i = 0; i < add_gralloc_buf->numFds; i++) {
 				fd_tmp = get_unused_fd_flags(O_RDWR);
 				fd_install(fd_tmp, add_gralloc_buf->data_files[i]);
 				pos = sizeof(int) * (3 + i);
