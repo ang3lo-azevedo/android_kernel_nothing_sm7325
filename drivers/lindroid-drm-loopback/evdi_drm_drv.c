@@ -373,15 +373,30 @@ int evdi_gbm_add_buf_ioctl(struct drm_device *dev, void *data,
 		printk("Failed to read numInts from memfd, bytes_read=%zd\n", bytes_read);
 		return -EIO;
 	}
+
 	add_gralloc_buf = kzalloc(sizeof(struct evdi_gralloc_buf), GFP_KERNEL);
+	if (!add_gralloc_buf)
+		return -ENOMEM;
+
 	add_gralloc_buf->numFds = numFds;
 	add_gralloc_buf->numInts = numInts;
-	add_gralloc_buf->data_ints = kzalloc(sizeof(int)*numInts, GFP_KERNEL);
-	add_gralloc_buf->data_files = kzalloc(sizeof(struct file*)*numFds, GFP_KERNEL);
 	add_gralloc_buf->memfd_file = memfd_file;
 
+	add_gralloc_buf->data_ints = kzalloc(sizeof(int) * numInts, GFP_KERNEL);
+	if (!add_gralloc_buf->data_ints) {
+		kfree(add_gralloc_buf);
+		return -ENOMEM;
+	}
+
+	add_gralloc_buf->data_files = kzalloc(sizeof(struct file *) * numFds, GFP_KERNEL);
+	if (!add_gralloc_buf->data_files) {
+		kfree(add_gralloc_buf->data_ints);
+		kfree(add_gralloc_buf);
+		return -ENOMEM;
+	}
+
 	int i;
-	for(i = 0; i < numFds; i++) {
+	for (i = 0; i < numFds; i++) {
 		bytes_read = kernel_read(memfd_file, &fd, sizeof(fd), &pos);
 		if (bytes_read != sizeof(fd)) {
 			printk("Failed to read fd from memfd, bytes_read=%zd\n", bytes_read);
@@ -393,11 +408,11 @@ int evdi_gbm_add_buf_ioctl(struct drm_device *dev, void *data,
 			return -EINVAL;
 		}
 		add_gralloc_buf->data_files[i] = fd_file;
-
 	}
 
-	bytes_read = kernel_read(memfd_file, add_gralloc_buf->data_ints, sizeof(int) *numInts, &pos);
-	if (bytes_read != sizeof(int) *numInts) {
+	bytes_read = kernel_read(memfd_file, add_gralloc_buf->data_ints,
+					sizeof(int) * numInts, &pos);
+	if (bytes_read != sizeof(int) * numInts) {
 		printk("Failed to read ints from memfd, bytes_read=%zd\n", bytes_read);
 		return -EIO;
 	}
@@ -408,19 +423,20 @@ int evdi_gbm_add_buf_ioctl(struct drm_device *dev, void *data,
 
 	wake_up(&evdi->poll_ioct_wq);
 	ret = wait_event_interruptible(event->wait, event->completed);
-	if (ret < 0){
+	if (ret < 0) {
 		printk("evdi_gbm_add_buf_ioctl: wait_event_interruptible interrupted: %d\n", ret);
 		return ret;
 	}
 
 	ret = event->result;
 	if (ret < 0) {
-		pr_err("evdi_gbm_add_buf_ioctl: user ioctl failled\n");
+		pr_err("evdi_gbm_add_buf_ioctl: user ioctl failed\n");
 		return ret;
 	}
 
 	if (ret)
 		goto err_inval;
+
 	cmd->id = *((int *)event->reply_data);
 	mutex_lock(&evdi->event_lock);
 	idr_remove(&evdi->event_idr, event->poll_id);
@@ -428,9 +444,7 @@ int evdi_gbm_add_buf_ioctl(struct drm_device *dev, void *data,
 	kfree(event);
 	return 0;
 
- err_no_mem:
-	return -ENOMEM;
- err_inval:
+err_inval:
 	return -EINVAL;
 }
 
