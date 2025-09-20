@@ -539,6 +539,7 @@ config NT_SLOT_STATE
         help
           NT SLOT State Driver.
 
+source "drivers/misc/cpu_efficiency/Kconfig"
 source "drivers/misc/c2port/Kconfig"
 source "drivers/misc/eeprom/Kconfig"
 source "drivers/misc/cb710/Kconfig"
