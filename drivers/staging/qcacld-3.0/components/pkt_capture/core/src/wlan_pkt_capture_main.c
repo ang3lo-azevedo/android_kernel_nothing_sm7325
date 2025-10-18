@@ -1049,7 +1049,8 @@ pkt_capture_vdev_create_notification(struct wlan_objmgr_vdev *vdev, void *arg)
 	struct pkt_capture_vdev_priv *vdev_priv;
 	QDF_STATUS status;
 
-	if ((wlan_vdev_mlme_get_opmode(vdev) != QDF_STA_MODE) ||
+	if ((wlan_vdev_mlme_get_opmode(vdev) != QDF_STA_MODE &&
+	     wlan_vdev_mlme_get_opmode(vdev) != QDF_MONITOR_MODE) ||
 	    !pkt_capture_get_mode(wlan_vdev_get_psoc(vdev)))
 		return QDF_STATUS_SUCCESS;
 
