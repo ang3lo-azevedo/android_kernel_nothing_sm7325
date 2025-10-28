@@ -97,7 +97,7 @@ void hdd_monitor_set_rx_monitor_cb(struct ol_txrx_ops *txrx,
 int hdd_enable_monitor_mode(struct net_device *dev)
 {
 	void *soc = cds_get_context(QDF_MODULE_ID_SOC);
-	uint8_t vdev_id;
+	int vdev_id;
 
 	hdd_enter_dev(dev);
 
@@ -108,9 +108,14 @@ int hdd_enable_monitor_mode(struct net_device *dev)
 	return cdp_set_monitor_mode(soc, vdev_id, false);
 }
 
-int hdd_disable_monitor_mode(void)
+int hdd_disable_monitor_mode(struct net_device *dev)
 {
 	void *soc = cds_get_context(QDF_MODULE_ID_SOC);
+	int vdev_id;
 
-	return cdp_reset_monitor_mode(soc, OL_TXRX_PDEV_ID, false);
+	vdev_id = cdp_get_mon_vdev_from_pdev(soc, OL_TXRX_PDEV_ID);
+        if (vdev_id < 0)
+                return -EINVAL;
+
+	return cdp_reset_monitor_mode(soc, vdev_id, false);
 }
