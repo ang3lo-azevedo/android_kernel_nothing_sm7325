@@ -2621,6 +2621,12 @@ QDF_STATUS sir_convert_probe_frame2_struct(struct mac_context *mac,
 	}
 	/* & "transliterate" from a 'tDot11fProbeResponse' to a 'tSirProbeRespBeacon'... */
 
+	QDF_TRACE_HEX_DUMP(QDF_MODULE_ID_PE, QDF_TRACE_LEVEL_DEBUG,
+		pFrame, nFrame);
+	if (pr->WAPI.present)
+		pe_debug("unicast_cipher_suite_count %d",
+			pr->WAPI.unicast_cipher_suite_count);
+
 	/* Timestamp */
 	qdf_mem_copy((uint8_t *) pProbeResp->timeStamp,
 		     (uint8_t *) &pr->TimeStamp, sizeof(tSirMacTimeStamp));
@@ -6174,7 +6180,7 @@ QDF_STATUS populate_dot11f_rrm_ie(struct mac_context *mac,
 
 void populate_mdie(struct mac_context *mac,
 		   tDot11fIEMobilityDomain *pDot11f,
-		   uint8_t *mdie)
+		   uint8_t mdie[SIR_MDIE_SIZE])
 {
 	pDot11f->present = 1;
 	pDot11f->MDID = (uint16_t) ((mdie[1] << 8) | (mdie[0]));
