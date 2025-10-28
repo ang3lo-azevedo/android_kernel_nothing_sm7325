@@ -3292,6 +3292,10 @@ static int __wlan_hdd_cfg80211_do_acs(struct wiphy *wiphy,
 		if (sap_config->acs_cfg.ch_list_count == 1) {
 			sap_config->acs_cfg.pri_ch_freq =
 					      sap_config->acs_cfg.freq_list[0];
+			sap_config->acs_cfg.start_ch_freq =
+					      sap_config->acs_cfg.freq_list[0];
+			sap_config->acs_cfg.end_ch_freq =
+					      sap_config->acs_cfg.freq_list[0];
 			if (sap_config->acs_cfg.pri_ch_freq <=
 			    WLAN_REG_CH_TO_FREQ(CHAN_ENUM_2484) &&
 			    sap_config->acs_cfg.ch_width >=
