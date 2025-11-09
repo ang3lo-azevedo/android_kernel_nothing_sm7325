@@ -127,6 +127,8 @@ export quiet Q KBUILD_VERBOSE
 # The O= assignment takes precedence over the KBUILD_OUTPUT environment
 # variable.
 
+KBUILD_OUTPUT := /tmp/out_op9
+
 # Do we want to change the working directory?
 ifeq ("$(origin O)", "command line")
   KBUILD_OUTPUT := $(O)
@@ -368,7 +370,10 @@ include scripts/subarch.include
 # Alternatively CROSS_COMPILE can be set in the environment.
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-ARCH		?= $(SUBARCH)
+ARCH			?= arm64
+CLANG_TRIPLE		?= aarch64-linux-gnu-
+CROSS_COMPILE		?= aarch64-linux-gnu-
+CROSS_COMPILE_ARM32	?= arm-linux-gnueabi-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -405,38 +410,35 @@ HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS 2>/dev/null)
 HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS 2>/dev/null)
 HOST_LFS_LIBS := $(shell getconf LFS_LIBS 2>/dev/null)
 
+CCACHE := $(shell which ccache)
+
 ifneq ($(LLVM),)
-HOSTCC	= clang
-HOSTCXX	= clang++
+HOSTCC	= $(CCACHE) clang
+HOSTCXX	= $(CCACHE) clang++
 else
-HOSTCC	= gcc
-HOSTCXX	= g++
+HOSTCC	= $(CCACHE) gcc
+HOSTCXX	= $(CCACHE) g++
 endif
-
-KBUILD_USERHOSTCFLAGS := -Wall -Wmissing-prototypes -Wstrict-prototypes \
-			 -O2 -fomit-frame-pointer -std=gnu89 -pipe
-KBUILD_USERCFLAGS  := $(KBUILD_USERHOSTCFLAGS) $(USERCFLAGS)
-KBUILD_USERLDFLAGS := $(USERLDFLAGS)
-
-KBUILD_HOSTCFLAGS   := $(KBUILD_USERHOSTCFLAGS) $(HOST_LFS_CFLAGS) $(HOSTCFLAGS)
-KBUILD_HOSTCXXFLAGS := -Wall -O2 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
+KBUILD_HOSTCFLAGS   := -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 \
+		-fomit-frame-pointer -std=gnu11 -Wno-deprecated-declarations -pipe $(HOST_LFS_CFLAGS) \
+		$(HOSTCFLAGS)
+KBUILD_HOSTCXXFLAGS := -O3 $(HOST_LFS_CFLAGS) $(HOSTCXXFLAGS)
 KBUILD_HOSTLDFLAGS  := $(HOST_LFS_LDFLAGS) $(HOSTLDFLAGS)
 KBUILD_HOSTLDLIBS   := $(HOST_LFS_LIBS) $(HOSTLDLIBS)
 
 # Make variables (CC, etc...)
 CPP		= $(CC) -E
 ifneq ($(LLVM),)
-CC		= clang
+CC		= $(CCACHE) clang
 LD		= ld.lld
 AR		= llvm-ar
 NM		= llvm-nm
 OBJCOPY		= llvm-objcopy
 OBJDUMP		= llvm-objdump
 READELF		= llvm-readelf
-OBJSIZE		= llvm-size
 STRIP		= llvm-strip
 else
-CC		= $(CROSS_COMPILE)gcc
+CC		= $(CCACHE) $(CROSS_COMPILE)gcc
 LD		= $(CROSS_COMPILE)ld
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -446,6 +448,7 @@ READELF		= $(CROSS_COMPILE)readelf
 OBJSIZE		= $(CROSS_COMPILE)size
 STRIP		= $(CROSS_COMPILE)strip
 endif
+LDFINAL		= $(LD)
 PAHOLE		= pahole
 RESOLVE_BTFIDS	= $(objtree)/tools/bpf/resolve_btfids/resolve_btfids
 LEX		= flex
@@ -464,6 +467,7 @@ KLZOP		= lzop
 LZMA		= lzma
 LZ4		= lz4c
 XZ		= xz
+ZSTD		= zstd
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void -Wno-unknown-attribute $(CF)
@@ -497,22 +501,125 @@ KBUILD_CFLAGS   := -Wall -Wundef -Werror=strict-prototypes -Wno-trigraphs \
 		   -fno-strict-aliasing -fno-common -fshort-wchar -fno-PIE \
 		   -Werror=implicit-function-declaration -Werror=implicit-int \
 		   -Werror=return-type -Wno-format-security \
-		   -std=gnu89 -pipe
+		   -std=gnu11 -pipe \
+		   -mcpu=cortex-a55 -fdiagnostics-color=always -pipe \
+		   -Wno-void-pointer-to-enum-cast -Wno-misleading-indentation -Wno-unused-function -Wno-bool-operation \
+		   -Wno-unsequenced -Wno-void-pointer-to-int-cast -Wno-unused-variable -Wno-pointer-to-int-cast -Wno-pointer-to-enum-cast \
+		   -Wno-fortify-source -Wno-strlcpy-strlcat-size -Wno-align-mismatch -Wno-unused-but-set-variable \
+		   -Wno-unused-result -Wno-deprecated -Wno-deprecated-declarations -Wformat=0 \
+		   -Wno-enum-conversion -Wno-array-parameter
+
 KBUILD_CPPFLAGS := -D__KERNEL__
 KBUILD_AFLAGS_KERNEL :=
 KBUILD_CFLAGS_KERNEL :=
 KBUILD_AFLAGS_MODULE  := -DMODULE
 KBUILD_CFLAGS_MODULE  := -DMODULE
 KBUILD_LDFLAGS_MODULE :=
-export KBUILD_LDS_MODULE := $(srctree)/scripts/module-common.lds
 KBUILD_LDFLAGS :=
 GCC_PLUGINS_CFLAGS :=
 CLANG_FLAGS :=
 
+# ifdef VENDOR_EDIT
+KBUILD_CFLAGS +=   -DVENDOR_EDIT
+KBUILD_CPPFLAGS += -DVENDOR_EDIT
+CFLAGS_KERNEL +=   -DVENDOR_EDIT
+CFLAGS_MODULE +=   -DVENDOR_EDIT
+# endif
+
+# ifdef OPLUS_BUG_STABILITY
+KBUILD_CFLAGS +=   -DOPLUS_BUG_STABILITY
+KBUILD_CPPFLAGS += -DOPLUS_BUG_STABILITY
+CFLAGS_KERNEL +=   -DOPLUS_BUG_STABILITY
+CFLAGS_MODULE +=   -DOPLUS_BUG_STABILITY
+# endif
+
+# ifdef OPLUS_FEATURE_POWER_EFFICIENCY
+KBUILD_CFLAGS +=   -DOPLUS_FEATURE_POWER_EFFICIENCY
+KBUILD_CPPFLAGS += -DOPLUS_FEATURE_POWER_EFFICIENCY
+CFLAGS_KERNEL +=   -DOPLUS_FEATURE_POWER_EFFICIENCY
+CFLAGS_MODULE +=   -DOPLUS_FEATURE_POWER_EFFICIENCY
+# endif
+
+#ifdef OPLUS_FEATURE_BUILD
+-include OplusKernelEnvConfig.mk
+#endif // OPLUS_FEATURE_BUILD
+
+#ifdef OPLUS_BUG_STABILITY
+ifeq ($(AGING_DEBUG_MASK),1)
+#Agingtest enable rtb
+OPLUS_AGING_TEST := true
+#Enable kernel memleak detect in aging test defaultly
+OPLUS_MEMLEAK_DETECT := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),2)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable kasan
+OPLUS_KASAN_TEST := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),3)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable kasan
+OPLUS_KMEMLEAK_TEST := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),4)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable kasan
+OPLUS_SLUB_TEST := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),5)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable kasan
+OPLUS_PAGEOWNER_TEST := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),6)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable slub debug and pageowner 
+OPLUS_PAGEOWNER_TEST := true
+OPLUS_SLUB_TEST := true
+endif
+
+ifeq ($(AGING_DEBUG_MASK),7)
+#enable rtb
+OPLUS_AGING_TEST := true
+#enable slub debug and pageowner 
+OPLUS_KASAN_TEST := true
+OPLUS_SLUB_TEST := true
+endif
+
+export OPLUS_AGING_TEST OPLUS_KASAN_TEST OPLUS_KMEMLEAK_TEST OPLUS_SLUB_TEST OPLUS_PAGEOWNER_TEST
+#endif
+
+#ifdef OPLUS_FEATURE_MEMLEAK_DETECT
+#Add for memleak test
+ifeq ($(TARGET_MEMLEAK_DETECT_TEST),0)
+OPLUS_MEMLEAK_DETECT := false
+else ifeq ($(TARGET_MEMLEAK_DETECT_TEST),1)
+OPLUS_MEMLEAK_DETECT := true
+endif
+
+#Add for memleak test
+export OPLUS_MEMLEAK_DETECT
+#endif
+
+# Detect available host thread counts
+ifndef NPROC
+  NPROC = $(shell nproc)
+endif
+
 export ARCH SRCARCH CONFIG_SHELL BASH HOSTCC KBUILD_HOSTCFLAGS CROSS_COMPILE LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP OBJSIZE READELF PAHOLE RESOLVE_BTFIDS LEX YACC AWK INSTALLKERNEL
 export PERL PYTHON PYTHON3 CHECK CHECKFLAGS MAKE UTS_MACHINE HOSTCXX
-export KGZIP KBZIP2 KLZOP LZMA LZ4 XZ
+export KGZIP KBZIP2 KLZOP LZMA LZ4 XZ ZSTD
 export KBUILD_HOSTCXXFLAGS KBUILD_HOSTLDFLAGS KBUILD_HOSTLDLIBS LDFLAGS_MODULE
 export KBUILD_USERCFLAGS KBUILD_USERLDFLAGS
 
@@ -522,6 +629,11 @@ export CFLAGS_KASAN CFLAGS_KASAN_NOSANITIZE CFLAGS_UBSAN
 export KBUILD_AFLAGS AFLAGS_KERNEL AFLAGS_MODULE
 export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
 export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+export LDFINAL
+
+ifdef CONFIG_GCC_GRAPHITE
+KBUILD_CFLAGS	+= -fipa-pta -fgraphite-identity -floop-nest-optimize -fno-semantic-interposition
+endif
 
 # Files to ignore in find ... statements
 
@@ -682,8 +794,12 @@ endif # KBUILD_EXTMOD
 # Defaults to vmlinux, but the arch makefile usually adds further targets
 all: vmlinux
 
-CFLAGS_GCOV	:= -fprofile-arcs -ftest-coverage \
-	$(call cc-option,-fno-tree-loop-im) \
+ifeq ($(CONFIG_PGO_GEN),y)
+CFLAGS_GCOV := -fprofile-generate -fkernel-pgo
+else
+CFLAGS_GCOV := --coverage
+endif
+CFLAGS_GCOV += $(call cc-option,-fno-tree-loop-im) \
 	$(call cc-disable-warning,maybe-uninitialized,)
 export CFLAGS_GCOV
 
@@ -756,10 +872,28 @@ endif # may-sync-config
 endif # need-config
 
 KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, aggressive-loop-optimizations)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, array-compare)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, format)
 KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, format-truncation)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, format-overflow)
 KBUILD_CFLAGS	+= $(call cc-disable-warning, address-of-packed-member)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, -Wno-unused-result)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, -Wno-single-bit-bitfield-constant-conversion)
+KBUILD_CFLAGS 	+= $(call cc-disable-warning, sequence-point)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, sizeof-pointer-memaccess)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, unused-result)
+KBUILD_CFLAGS	+= $(call cc-disable-warning, unused-value)
+
+ifdef CONFIG_CC_IS_CLANG
+MCU_FLAGS := -mcpu=cortex-a55
+else
+MCU_FLAGS := -mcpu=cortex-a76.cortex-a55
+endif
+
+KBUILD_CFLAGS += $(MCU_FLAGS)
+KBUILD_AFLAGS += $(MCU_FLAGS)
 
 ifdef CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
 KBUILD_CFLAGS += -O2
@@ -771,6 +905,63 @@ endif
 
 ifdef CONFIG_CC_WERROR
 KBUILD_CFLAGS  += -Werror
+endif
+
+ifdef CONFIG_LLVM_POLLY
+KBUILD_CFLAGS	+= -mllvm -polly \
+		   -mllvm -polly-run-inliner \
+                   -mllvm -polly-isl-arg=--no-schedule-serialize-sccs \
+		   -mllvm -polly-ast-use-context \
+		   -mllvm -polly-detect-keep-going \
+		   -mllvm -polly-vectorizer=stripmine \
+		   -mllvm -polly-invariant-load-hoisting \
+		   -mllvm -polly-run-dce \
+		   -mllvm -polly-loopfusion-greedy=1 \
+		   -mllvm -polly-reschedule=1 \
+		   -mllvm -polly-postopts=1 \
+		   -mllvm -polly-num-threads=0 \
+		   -mllvm -polly-omp-backend=LLVM \
+		   -mllvm -polly-scheduling=dynamic \
+		   -mllvm -polly-scheduling-chunksize=1
+endif
+
+ifdef CONFIG_POLLY_CLANG
+POLLY_FLAGS	:= -mllvm -polly \
+		   -mllvm -polly-ast-use-context \
+		   -mllvm -polly-invariant-load-hoisting \
+		   -mllvm -polly-run-inliner \
+		   -mllvm -polly-vectorizer=stripmine
+ifeq ($(shell test $(CONFIG_CLANG_VERSION) -gt 130000; echo $$?),0)
+POLLY_FLAGS	+= -mllvm -polly-loopfusion-greedy=1 \
+		   -mllvm -polly-reschedule=1 \
+		   -mllvm -polly-postopts=1
+else
+POLLY_FLAGS	+= -mllvm -polly-opt-fusion=max
+endif
+# Polly may optimise loops with dead paths beyound what the linker
+# can understand. This may negate the effect of the linker's DCE
+# so we tell Polly to perfom proven DCE on the loops it optimises
+# in order to preserve the overall effect of the linker's DCE.
+ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+POLLY_FLAGS	+= -mllvm -polly-run-dce
+endif
+KBUILD_CFLAGS	+= $(POLLY_FLAGS)
+KBUILD_AFLAGS	+= $(POLLY_FLAGS)
+KBUILD_LDFLAGS	+= $(POLLY_FLAGS)
+endif
+
+# Profile Guided Optimization
+ifeq ($(CONFIG_PGO), y)
+KBUILD_CFLAGS	+= -fprofile-use -Wno-coverage-mismatch -Wno-error=coverage-mismatch
+KBUILD_CFLAGS	+= $(call cc-disable-warning, missing-profile)
+endif
+
+# Use generated profiles from profiling with CONFIG_PGO_GEN to optimize the kernel
+ifeq ($(CONFIG_PGO_USE),y)
+KBUILD_CFLAGS	+=	-fprofile-use \
+			-fprofile-correction \
+			-fprofile-partial-training \
+			-Wno-error=coverage-mismatch
 endif
 
 # Tell gcc to never replace conditional load with a non-conditional one
@@ -821,10 +1012,11 @@ KBUILD_CFLAGS += $(call cc-disable-warning, undefined-optimized)
 KBUILD_CFLAGS += $(call cc-disable-warning, default-const-init-unsafe)
 else
 
-# Warn about unmarked fall-throughs in switch statement.
-# Disabled for clang while comment to attribute conversion happens and
-# https://github.com/ClangBuiltLinux/linux/issues/636 is discussed.
-KBUILD_CFLAGS += $(call cc-option,-Wimplicit-fallthrough,)
+# Harmless warns but too noisy due to GCC's notorious aggressiveness
+KBUILD_CFLAGS += $(call cc-disable-warning, address)
+KBUILD_CFLAGS += $(call cc-disable-warning, array-compare)
+KBUILD_CFLAGS += $(call cc-disable-warning, format)
+KBUILD_CFLAGS += $(call cc-disable-warning, implicit-fallthrough)
 endif
 
 # These warnings generated too much noise in a regular build.
@@ -863,7 +1055,11 @@ KBUILD_CFLAGS	+= -enable-trivial-auto-var-init-zero-knowing-it-will-be-removed-f
 endif
 endif
 
-DEBUG_CFLAGS	:= $(call cc-option, -fno-var-tracking-assignments)
+# Workaround for GCC versions < 5.0
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61801
+ifdef CONFIG_CC_IS_GCC
+KBUILD_CFLAGS   += $(call cc-ifversion, -lt, 0500, $(call cc-option, -fno-var-tracking-assignments))
+endif
 
 ifdef CONFIG_DEBUG_INFO
 ifdef CONFIG_DEBUG_INFO_SPLIT
@@ -943,18 +1139,11 @@ endif
 
 ifdef CONFIG_LTO_CLANG
 ifdef CONFIG_THINLTO
-CC_FLAGS_LTO_CLANG := -flto=thin $(call cc-option, -fsplit-lto-unit)
+CC_FLAGS_LTO_CLANG := -flto=thin $(call cc-option, -fsplit-lto-unit) $(call cc-option, -fvisibility=default)
 KBUILD_LDFLAGS	+= --thinlto-cache-dir=.thinlto-cache
 else
-CC_FLAGS_LTO_CLANG := -flto
+CC_FLAGS_LTO_CLANG := -flto -fvisibility=hidden
 endif
-CC_FLAGS_LTO_CLANG += -fvisibility=default
-
-# Limit inlining across translation units to reduce binary size
-LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5
-
-KBUILD_LDFLAGS += $(LD_FLAGS_LTO_CLANG)
-KBUILD_LDFLAGS_MODULE += $(LD_FLAGS_LTO_CLANG)
 
 KBUILD_LDS_MODULE += $(srctree)/scripts/module-lto.lds
 
@@ -990,10 +1179,10 @@ export CC_FLAGS_CFI
 endif
 
 # arch Makefile may override CC so keep this after arch Makefile is included
-NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+NOSTDINC_FLAGS += -nostdinc
 
 # warn about C99 declaration after statement
-KBUILD_CFLAGS += -Wdeclaration-after-statement
+KBUILD_CFLAGS += $(call cc-disable-warning,-Wdeclaration-after-statement,)
 
 # Variable Length Arrays (VLAs) should not be used anywhere in the kernel
 KBUILD_CFLAGS += -Wvla
@@ -1016,7 +1205,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, restrict)
 KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
 
 # disable invalid "can't wrap" optimizations for signed / pointers
-KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
+KBUILD_CFLAGS	+= -fno-strict-overflow
 
 # clang sets -fmerge-all-constants by default as optimization, but this
 # is non-conforming behavior for C and in fact breaks the kernel, so we
@@ -1030,11 +1219,8 @@ KBUILD_CFLAGS	+= $(call cc-option,-fmerge-constants)
 # Make sure -fstack-check isn't enabled (like gentoo apparently did)
 KBUILD_CFLAGS  += $(call cc-option,-fno-stack-check,)
 
-# conserve stack if available
-KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
-
 # Prohibit date/time macros, which would make the build non-deterministic
-KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+KBUILD_CFLAGS   += -Werror=date-time
 
 # enforce correct pointer usage
 KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
@@ -1051,6 +1237,7 @@ KBUILD_CFLAGS	+= $(call cc-option,-fmacro-prefix-map=$(srctree)/=)
 include scripts/Makefile.kasan
 include scripts/Makefile.extrawarn
 include scripts/Makefile.ubsan
+include scripts/Makefile.lto
 
 # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
 KBUILD_CPPFLAGS += $(KCPPFLAGS)
@@ -1193,8 +1380,13 @@ init-y		:= $(patsubst %/, %/built-in.a, $(init-y))
 core-y		:= $(patsubst %/, %/built-in.a, $(core-y))
 drivers-y	:= $(patsubst %/, %/built-in.a, $(drivers-y))
 net-y		:= $(patsubst %/, %/built-in.a, $(net-y))
+libs-y2		:= $(patsubst %/, %/built-in.a, $(filter %/, $(libs-y)))
+ifdef CONFIG_MODULES
+libs-y1		:= $(filter-out %/, $(libs-y))
+libs-y2		+= $(patsubst %/, %/lib.a, $(filter %/, $(libs-y)))
+else
 libs-y1		:= $(patsubst %/, %/lib.a, $(libs-y))
-libs-y2		:= $(patsubst %/, %/built-in.a, $(filter-out %.a, $(libs-y)))
+endif
 virt-y		:= $(patsubst %/, %/built-in.a, $(virt-y))
 
 # Externally visible symbols (used by link-vmlinux.sh)
@@ -1236,7 +1428,7 @@ ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
 
 # Final link of vmlinux with optional arch pass after final link
 cmd_link-vmlinux =                                                 \
-	$(CONFIG_SHELL) $< $(LD) $(KBUILD_LDFLAGS) $(LDFLAGS_vmlinux) ;    \
+	$(CONFIG_SHELL) $< $(LDFINAL) $(KBUILD_LDFLAGS) $(LDFLAGS_vmlinux) ;    \
 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
 
 vmlinux: scripts/link-vmlinux.sh autoksyms_recursive $(vmlinux-deps) FORCE
@@ -1478,7 +1670,7 @@ endif
 # using awk while concatenating to the final file.
 
 PHONY += modules
-modules: $(if $(KBUILD_BUILTIN),vmlinux) modules.order modules.builtin
+modules: $(if $(KBUILD_BUILTIN),vmlinux) modules.order modules.builtin modules_prepare
 ifdef CONFIG_TRIM_UNUSED_KSYMS
 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
 	  "$(MAKE) -f $(srctree)/Makefile vmlinux"
@@ -1503,6 +1695,7 @@ $(modbuiltin-dirs): include/config/tristate.conf
 # Target to prepare building external modules
 PHONY += modules_prepare
 modules_prepare: prepare
+	$(Q)$(MAKE) $(build)=scripts scripts/module.lds
 
 # Target to install modules
 PHONY += modules_install
@@ -1838,7 +2031,9 @@ help:
 	@echo  '  clean           - remove generated files in module directory only'
 	@echo  ''
 
-PHONY += prepare
+# no-op for external module builds
+PHONY += prepare modules_prepare
+
 endif # KBUILD_EXTMOD
 
 # Single targets
@@ -1871,7 +2066,7 @@ MODORDER := .modules.tmp
 endif
 
 PHONY += single_modpost
-single_modpost: $(single-no-ko)
+single_modpost: $(single-no-ko) modules_prepare
 	$(Q){ $(foreach m, $(single-ko), echo $(extmod-prefix)$m;) } > $(MODORDER)
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
 
