@@ -87,6 +87,7 @@ extern struct dentry *binderfs_create_file(struct dentry *dir, const char *name,
 					   const struct file_operations *fops,
 					   void *data);
 extern void binderfs_remove_file(struct dentry *dentry);
+extern void binder_remove_device(struct binder_device *device);
 #else
 static inline bool is_binderfs_device(const struct inode *inode)
 {
