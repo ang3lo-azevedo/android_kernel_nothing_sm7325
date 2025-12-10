@@ -61,10 +61,7 @@ enum binderfs_stats_mode {
 
 struct binder_features {
 	bool oneway_spam_detection;
-<<<<<<< HEAD
 	bool freeze_notification;
-=======
->>>>>>> 460de65538db (BACKPORT: binderfs: add support for feature files)
 };
 
 static const match_table_t tokens = {
@@ -75,10 +72,7 @@ static const match_table_t tokens = {
 
 static struct binder_features binder_features = {
 	.oneway_spam_detection = true,
-<<<<<<< HEAD
 	.freeze_notification = true,
-=======
->>>>>>> 460de65538db (BACKPORT: binderfs: add support for feature files)
 };
 
 static inline struct binderfs_info *BINDERFS_I(const struct inode *inode)
@@ -629,15 +623,12 @@ static int init_binder_features(struct super_block *sb)
 	if (IS_ERR(dentry))
 		return PTR_ERR(dentry);
 
-<<<<<<< HEAD
 	dentry = binderfs_create_file(dir, "freeze_notification",
 				      &binder_features_fops,
 				      &binder_features.freeze_notification);
 	if (IS_ERR(dentry))
 		return PTR_ERR(dentry);
 
-=======
->>>>>>> 460de65538db (BACKPORT: binderfs: add support for feature files)
 	return 0;
 }
 
@@ -668,22 +659,8 @@ static int init_binder_logs(struct super_block *sb)
 		goto out;
 	}
 
-	dentry = binderfs_create_file(binder_logs_root_dir, "state_hashed",
-				      &binder_state_hashed_fops, NULL);
-	if (IS_ERR(dentry)) {
-		ret = PTR_ERR(dentry);
-		goto out;
-	}
-
 	dentry = binderfs_create_file(binder_logs_root_dir, "transactions",
 				      &binder_transactions_fops, NULL);
-	if (IS_ERR(dentry)) {
-		ret = PTR_ERR(dentry);
-		goto out;
-	}
-
-	dentry = binderfs_create_file(binder_logs_root_dir, "transactions_hashed",
-				      &binder_transactions_hashed_fops, NULL);
 	if (IS_ERR(dentry)) {
 		ret = PTR_ERR(dentry);
 		goto out;

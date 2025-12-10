@@ -113,14 +113,8 @@ DEFINE_SHOW_ATTRIBUTE(binder_stats);
 int binder_state_show(struct seq_file *m, void *unused);
 DEFINE_SHOW_ATTRIBUTE(binder_state);
 
-int binder_state_hashed_show(struct seq_file *m, void *unused);
-DEFINE_SHOW_ATTRIBUTE(binder_state_hashed);
-
 int binder_transactions_show(struct seq_file *m, void *unused);
 DEFINE_SHOW_ATTRIBUTE(binder_transactions);
-
-int binder_transactions_hashed_show(struct seq_file *m, void *unused);
-DEFINE_SHOW_ATTRIBUTE(binder_transactions_hashed);
 
 int binder_transaction_log_show(struct seq_file *m, void *unused);
 DEFINE_SHOW_ATTRIBUTE(binder_transaction_log);
@@ -161,26 +155,8 @@ enum binder_stat_types {
 };
 
 struct binder_stats {
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-	atomic_t br[_IOC_NR(BR_ONEWAY_SPAM_SUSPECT) + 1];
-=======
-	atomic_t br[_IOC_NR(BR_FROZEN_REPLY) + 1];
->>>>>>> a4e84758f029 (UPSTREAM: binder: fix the missing BR_FROZEN_REPLY in binder_return_strings)
-=======
-	atomic_t br[_IOC_NR(BR_ONEWAY_SPAM_SUSPECT) + 1];
->>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
-	atomic_t bc[_IOC_NR(BC_REPLY_SG) + 1];
-=======
-	atomic_t br[_IOC_NR(BR_CLEAR_FREEZE_NOTIFICATION_DONE) + 1];
-	atomic_t bc[_IOC_NR(BC_FREEZE_NOTIFICATION_DONE) + 1];
->>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
-=======
 	atomic_t br[_IOC_NR(BR_ONEWAY_SPAM_SUSPECT) + 1];
 	atomic_t bc[_IOC_NR(BC_REPLY_SG) + 1];
->>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 	atomic_t obj_created[BINDER_STAT_COUNT];
 	atomic_t obj_deleted[BINDER_STAT_COUNT];
 };
@@ -204,21 +180,10 @@ struct binder_work {
 		BINDER_WORK_DEAD_BINDER,
 		BINDER_WORK_DEAD_BINDER_AND_CLEAR,
 		BINDER_WORK_CLEAR_DEATH_NOTIFICATION,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 #ifndef __GENKSYMS__
 		BINDER_WORK_FROZEN_BINDER,
 		BINDER_WORK_CLEAR_FREEZE_NOTIFICATION,
 #endif
-<<<<<<< HEAD
-=======
-		BINDER_WORK_FROZEN_BINDER,
-		BINDER_WORK_CLEAR_FREEZE_NOTIFICATION,
->>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
-=======
->>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
 	} type;
 };
 
@@ -454,18 +419,12 @@ enum binder_prio_state {
  * @is_frozen:            process is frozen and unable to service
  *                        binder transactions
  *                        (protected by @inner_lock)
-<<<<<<< HEAD
  * @sync_recv:            process received sync transactions since last frozen
-<<<<<<< HEAD
  *                        bit 0: received sync transaction after being frozen
  *                        bit 1: new pending sync transaction during freezing
-=======
->>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
  *                        (protected by @inner_lock)
  * @async_recv:           process received async transactions since last frozen
  *                        (protected by @inner_lock)
-=======
->>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
  * @freeze_wait:          waitqueue of processes waiting for all outstanding
  *                        transactions to be processed
  *                        (protected by @inner_lock)
@@ -514,25 +473,14 @@ struct binder_proc {
 	int outstanding_txns;
 	bool is_dead;
 	bool is_frozen;
-<<<<<<< HEAD
 	bool sync_recv;
 	bool async_recv;
-=======
->>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 	wait_queue_head_t freeze_wait;
 
 	struct list_head todo;
 	struct binder_stats stats;
 	struct list_head delivered_death;
-<<<<<<< HEAD
-<<<<<<< HEAD
-	struct list_head delivered_freeze;
-=======
->>>>>>> be02156857e4 (ANDROID: binder: fix KMI issues due to frozen notification)
-	int max_threads;
-=======
 	u32 max_threads;
->>>>>>> 11ac2a045473 (binder: fix max_thread type inconsistency)
 	int requested_threads;
 	int requested_threads_started;
 	int tmp_ref;

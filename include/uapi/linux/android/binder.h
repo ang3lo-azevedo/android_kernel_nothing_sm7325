@@ -271,10 +271,8 @@ struct binder_freeze_info {
 	__u32            timeout_ms;
 };
 
-<<<<<<< HEAD
 struct binder_frozen_status_info {
 	__u32            pid;
-<<<<<<< HEAD
 
 	/* process received sync transactions since last frozen
 	 * bit 0: received sync transaction after being frozen
@@ -292,14 +290,6 @@ struct binder_frozen_state_info {
 	__u32            reserved;
 };
 
-=======
-	__u32            sync_recv;
-	__u32            async_recv;
-};
-
->>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
-=======
->>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 #define BINDER_WRITE_READ		_IOWR('b', 1, struct binder_write_read)
 #define BINDER_SET_IDLE_TIMEOUT		_IOW('b', 3, __s64)
 #define BINDER_SET_MAX_THREADS		_IOW('b', 5, __u32)
@@ -311,14 +301,8 @@ struct binder_frozen_state_info {
 #define BINDER_GET_NODE_INFO_FOR_REF	_IOWR('b', 12, struct binder_node_info_for_ref)
 #define BINDER_SET_CONTEXT_MGR_EXT	_IOW('b', 13, struct flat_binder_object)
 #define BINDER_FREEZE			_IOW('b', 14, struct binder_freeze_info)
-<<<<<<< HEAD
 #define BINDER_GET_FROZEN_INFO		_IOWR('b', 15, struct binder_frozen_status_info)
-<<<<<<< HEAD
 #define BINDER_ENABLE_ONEWAY_SPAM_DETECTION	_IOW('b', 16, __u32)
-=======
->>>>>>> b1232b020f2f (FROMGIT: binder: BINDER_GET_FROZEN_INFO ioctl)
-=======
->>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 
 /*
  * NOTE: Two special error codes you should check for when calling
@@ -507,7 +491,6 @@ enum binder_driver_return_protocol {
 	 * The target of the last transaction (either a bcTRANSACTION or
 	 * a bcATTEMPT_ACQUIRE) is frozen.  No parameters.
 	 */
-<<<<<<< HEAD
 
 	BR_ONEWAY_SPAM_SUSPECT = _IO('r', 19),
 	/*
@@ -515,11 +498,6 @@ enum binder_driver_return_protocol {
 	 * asynchronous transaction makes the allocated async buffer size exceed
 	 * detection threshold.  No parameters.
 	 */
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
 
 	BR_FROZEN_BINDER = _IOR('r', 21, struct binder_frozen_state_info),
 	/*
@@ -531,15 +509,6 @@ enum binder_driver_return_protocol {
 	/*
 	 * void *: cookie
 	 */
-<<<<<<< HEAD
-=======
->>>>>>> edddeb1ad3d4 (UPSTREAM: binder: tell userspace to dump current backtrace when detected oneway spamming)
-=======
->>>>>>> d1e87637cdba (BACKPORT: FROMGIT: binder: frozen notification)
-=======
->>>>>>> 2bfddf30aae4 (BACKPORT: binder: tell userspace to dump current backtrace when detected oneway spamming)
-=======
->>>>>>> e658e9e4bcd9 (BACKPORT: FROMGIT: binder: BINDER_FREEZE ioctl)
 };
 
 enum binder_driver_command_protocol {
