@@ -198,7 +198,9 @@ static inline void binder_stats_created(enum binder_stat_types type)
 }
 
 struct binder_transaction_log binder_transaction_log;
+EXPORT_SYMBOL(binder_transaction_log);
 struct binder_transaction_log binder_transaction_log_failed;
+EXPORT_SYMBOL(binder_transaction_log_failed);
 
 static struct binder_transaction_log_entry *binder_transaction_log_add(
 	struct binder_transaction_log *log)
@@ -6910,6 +6912,21 @@ static void print_binder_proc_stats(struct seq_file *m,
 	print_binder_stats(m, "  ", &proc->stats);
 }
 
+static int binder_state_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, binder_state_show, NULL);
+}
+
+static int binder_stats_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, binder_stats_show, NULL);
+}
+
+static int binder_transactions_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, binder_transactions_show, NULL);
+}
+
 int binder_state_show(struct seq_file *m, void *unused)
 {
 	struct binder_proc *proc;
@@ -6948,6 +6965,7 @@ int binder_state_show(struct seq_file *m, void *unused)
 
 	return 0;
 }
+EXPORT_SYMBOL(binder_state_show);
 
 int binder_stats_show(struct seq_file *m, void *unused)
 {
@@ -6964,6 +6982,7 @@ int binder_stats_show(struct seq_file *m, void *unused)
 
 	return 0;
 }
+EXPORT_SYMBOL(binder_stats_show);
 
 int binder_transactions_show(struct seq_file *m, void *unused)
 {
@@ -6977,6 +6996,39 @@ int binder_transactions_show(struct seq_file *m, void *unused)
 
 	return 0;
 }
+EXPORT_SYMBOL(binder_transactions_show);
+
+static const struct file_operations binder_state_fops = {
+	.owner = THIS_MODULE,
+	.open = binder_state_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
+};
+
+static const struct file_operations binder_stats_fops = {
+	.owner = THIS_MODULE,
+	.open = binder_stats_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
+};
+
+static const struct file_operations binder_transactions_fops = {
+	.owner = THIS_MODULE,
+	.open = binder_transactions_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
+};
+
+static const struct file_operations binder_transaction_log_fops = {
+	.owner = THIS_MODULE,
+	.open = binder_transaction_log_open,
+	.read = seq_read,
+	.llseek = seq_lseek,
+	.release = single_release,
+};
 
 static int proc_show(struct seq_file *m, void *unused)
 {
@@ -7021,6 +7073,11 @@ static void print_binder_transaction_log_entry(struct seq_file *m,
 			"\n" : " (incomplete)\n");
 }
 
+static int binder_transaction_log_open(struct inode *inode, struct file *file)
+{
+	return single_open(file, binder_transaction_log_show, inode->i_private);
+}
+
 int binder_transaction_log_show(struct seq_file *m, void *unused)
 {
 	struct binder_transaction_log *log = m->private;
@@ -7041,6 +7098,7 @@ int binder_transaction_log_show(struct seq_file *m, void *unused)
 	}
 	return 0;
 }
+EXPORT_SYMBOL(binder_transaction_log_show);
 #endif
 
 const struct file_operations binder_fops = {

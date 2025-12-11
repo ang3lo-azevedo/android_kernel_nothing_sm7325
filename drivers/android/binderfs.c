@@ -632,6 +632,7 @@ static int init_binder_features(struct super_block *sb)
 	return 0;
 }
 
+#ifdef CONFIG_ANDROID_BINDER_LOGS
 static int init_binder_logs(struct super_block *sb)
 {
 	struct dentry *binder_logs_root_dir, *dentry, *proc_log_dir;
@@ -695,6 +696,7 @@ static int init_binder_logs(struct super_block *sb)
 out:
 	return ret;
 }
+#endif /* CONFIG_ANDROID_BINDER_LOGS */
 
 static int binderfs_fill_super(struct super_block *sb, void *data, int silent)
 {
@@ -777,8 +779,10 @@ static int binderfs_fill_super(struct super_block *sb, void *data, int silent)
 	if (ret)
 		return ret;
 
+#ifdef CONFIG_ANDROID_BINDER_LOGS
 	if (info->mount_opts.stats_mode == STATS_GLOBAL)
 		return init_binder_logs(sb);
+#endif
 
 	return 0;
 }
