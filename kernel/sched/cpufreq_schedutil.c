@@ -58,6 +58,9 @@ struct sugov_policy {
 	unsigned long rtg_boost_util;
 	unsigned long max;
         unsigned long prev_util;
+        unsigned long avg_util;
+        u64 last_upscale_ts;
+
 
 	raw_spinlock_t		update_lock;	/* For shared policies */
 	u64			last_freq_update_time;
@@ -294,22 +297,42 @@ static inline unsigned long walt_map_util_freq(unsigned long util,
 	unsigned long fmax = sg_policy->policy->cpuinfo.max_freq;
 	unsigned int shift = sg_policy->tunables->target_load_shift;
 
-        if (sg_policy->prev_util > util) {
-                sg_policy->tunables->target_load_thresh = 1024;
-        } else if (sg_policy->prev_util < util) {
-                sg_policy->tunables->target_load_thresh = 1536;
-        }
+	int delta = util - sg_policy->prev_util;
+	u64 now = sched_clock();
 
-        sg_policy->prev_util = util;
+	sg_policy->avg_util = (sg_policy->avg_util * 3 + util) >> 2;
 
-	if (util >= sg_policy->tunables->target_load_thresh &&
-	    cpu_util_rt(cpu_rq(cpu)) < (cap >> 2))
-		return max(
-			(fmax + (fmax >> shift)) * util,
-			(fmax + (fmax >> 2)) * sg_policy->tunables->target_load_thresh
-			)/cap;
+	if (sg_policy->avg_util < 300)
+		goto no_boost;
+
+	if (capacity_orig_of(cpu) > 900) { /* X1 */
+		if (sg_policy->avg_util < 900)
+			goto no_boost;
+	}
+
+	if (capacity_orig_of(cpu) > 600 && sg_policy->avg_util < 600)
+		goto no_boost;
+
+	/* Ignore scheduler noise */
+	if (abs(delta) < 96)
+		goto no_boost;
+
+	if (delta > 0) {
+		if (now - sg_policy->last_upscale_ts < 10 * NSEC_PER_MSEC)
+			goto no_boost;
+		sg_policy->last_upscale_ts = now;
+	}
+
+	sg_policy->prev_util = util;
+
+	/* Conservative mapping */
 	return (fmax + (fmax >> 2)) * util / cap;
+
+no_boost:
+	sg_policy->prev_util = util;
+	return (fmax * util) / cap;
 }
+
 
 #define TARGET_LOAD 80
 
@@ -1523,6 +1546,10 @@ static int sugov_init(struct cpufreq_policy *policy)
 		ret = -ENOMEM;
 		goto disable_fast_switch;
 	}
+	
+	sg_policy->avg_util = 0;
+        sg_policy->last_upscale_ts = 0;
+        sg_policy->prev_util = 0;
 
 	ret = sugov_kthread_create(sg_policy);
 	if (ret)
