@@ -2531,9 +2531,6 @@ static int handle_lookup_down(struct nameidata *nd)
 	struct inode *inode = nd->inode;
 	unsigned seq = nd->seq;
 	int err;
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-	struct dentry *dentry;
-#endif
 
 	if (nd->flags & LOOKUP_RCU) {
 		/*
@@ -3429,23 +3426,6 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
 				path->mnt = nd->path.mnt;
 				return 0;
 			}
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-			if (nd->state & ND_STATE_LAST_SDCARD_SUS_PATH) {
-				// return -ENOENT here since it is walking the sub path of sus sdcard path
-				return -ENOENT;
-			}
-			if (parent->d_inode) {
-				if (susfs_is_base_dentry_android_data_dir(parent) &&
-					susfs_is_sus_android_data_d_name_found(name))
-				{
-					nd->state |= ND_STATE_LAST_SDCARD_SUS_PATH;
-				} else if (susfs_is_base_dentry_sdcard_dir(parent) &&
-						   susfs_is_sus_sdcard_d_name_found(name))
-				{
-					nd->state |= ND_STATE_LAST_SDCARD_SUS_PATH;
-				}
-			}
-#endif
 		}
 	}
 	dput(dentry);
