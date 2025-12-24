@@ -65,25 +65,19 @@
 #include <linux/vmalloc.h>
 #ifdef CONFIG_KSU_SUSFS
 #include <linux/susfs_def.h>
-#include "../drivers/kernelsu/ksu.h"
-#endif
-#include <linux/uaccess.h>
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-#include <linux/susfs_def.h>
 #endif
 
+#include <linux/uaccess.h>
 #include <asm/mmu_context.h>
 #include <asm/tlb.h>
+
 #include <trace/events/task.h>
 #include "internal.h"
 
 #include <trace/events/sched.h>
 
 int suid_dumpable = 0;
-extern bool ksu_su_compat_enabled;
-extern bool ksu_execveat_hook;
-extern bool susfs_is_boot_completed_triggered;
-extern bool __ksu_is_allow_uid_for_current(uid_t uid);
+
 static LIST_HEAD(formats);
 static DEFINE_RWLOCK(binfmt_lock);
 
@@ -710,7 +704,7 @@ int setup_arg_pages(struct linux_binprm *bprm,
 		    unsigned long stack_top,
 		    int executable_stack)
 {
-	unsigned long ret;
+	int ret;
 	unsigned long stack_shift;
 	struct mm_struct *mm = current->mm;
 	struct vm_area_struct *vma = bprm->vma;
@@ -1751,9 +1745,13 @@ static int exec_binprm(struct linux_binprm *bprm)
 	return ret;
 }
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-extern bool susfs_is_sus_su_hooks_enabled __read_mostly;
-extern bool __ksu_is_allow_uid(uid_t uid);
+#ifdef CONFIG_KSU_SUSFS
+extern bool ksu_execveat_hook __read_mostly;
+extern bool ksu_su_compat_enabled __read_mostly;
+extern bool susfs_is_boot_completed_triggered __read_mostly;
+extern bool __ksu_is_allow_uid_for_current(uid_t uid);
+extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
+			void *envp, int *flags);
 extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
 				void *envp, int *flags);
 #endif
@@ -1773,6 +1771,7 @@ static int __do_execve_file(int fd, struct filename *filename,
 
 	if (IS_ERR(filename))
 		return PTR_ERR(filename);
+
 #ifdef CONFIG_KSU_SUSFS
 	if (likely(susfs_is_current_proc_umounted()) || !ksu_su_compat_enabled) {
 		goto orig_flow;
@@ -1784,18 +1783,6 @@ static int __do_execve_file(int fd, struct filename *filename,
 		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
 	}
 
-orig_flow:
-#endif
-
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	if (likely(susfs_is_current_proc_umounted())) {
-		goto orig_flow;
-	}
-	if (likely(susfs_is_sus_su_hooks_enabled) &&
-		unlikely(__ksu_is_allow_uid(current_uid().val)))
-	{
-		ksu_handle_execveat_sucompat(&fd, &filename, &argv, &envp, &flags);
-	}
 orig_flow:
 #endif
 
@@ -1945,17 +1932,6 @@ out_ret:
 	return retval;
 }
 
-#ifdef CONFIG_KSU_SUSFS
-extern bool ksu_execveat_hook __read_mostly;
-extern bool ksu_su_compat_enabled __read_mostly;
-extern bool susfs_is_boot_completed_triggered __read_mostly;
-extern bool __ksu_is_allow_uid_for_current(uid_t uid);
-extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
-			void *envp, int *flags);
-extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
-				void *envp, int *flags);
-#endif
-
 static int do_execveat_common(int fd, struct filename *filename,
 			      struct user_arg_ptr argv,
 			      struct user_arg_ptr envp,
@@ -1972,20 +1948,12 @@ int do_execve_file(struct file *file, void *__argv, void *__envp)
 	return __do_execve_file(AT_FDCWD, NULL, argv, envp, 0, file);
 }
 
-#ifdef CONFIG_KSU
-__attribute__((hot))
-extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr,
-				void *argv, void *envp, int *flags);
-#endif
 int do_execve(struct filename *filename,
 	const char __user *const __user *__argv,
 	const char __user *const __user *__envp)
 {
 	struct user_arg_ptr argv = { .ptr.native = __argv };
 	struct user_arg_ptr envp = { .ptr.native = __envp };
-#ifdef CONFIG_KSU
-	ksu_handle_execveat((int *)AT_FDCWD, &filename, &argv, &envp, 0);
-#endif
 	return do_execveat_common(AT_FDCWD, filename, argv, envp, 0);
 }
 

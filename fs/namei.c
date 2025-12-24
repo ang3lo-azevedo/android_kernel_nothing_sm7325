@@ -1699,10 +1699,10 @@ static int lookup_fast(struct nameidata *nd,
 	struct vfsmount *mnt = nd->path.mnt;
 	struct dentry *dentry, *parent = nd->path.dentry;
 	int status = 1;
+	int err;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	bool is_nd_state_lookup_last_and_open_last = (nd->state & ND_STATE_LOOKUP_LAST || nd->state & ND_STATE_OPEN_LAST);
 #endif
-	int err;
 
 	/*
 	 * Rename seqlock is not required here because in the off chance
@@ -1711,6 +1711,7 @@ static int lookup_fast(struct nameidata *nd,
 	 */
 	if (nd->flags & LOOKUP_RCU) {
 		unsigned seq;
+		bool negative;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 		unsigned backup_next_seq;
 
@@ -1728,7 +1729,6 @@ static int lookup_fast(struct nameidata *nd,
 			}
 		}
 #endif
-		bool negative;
 		dentry = __d_lookup_rcu(parent, &nd->last, &seq);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 		if (is_nd_state_lookup_last_and_open_last && dentry && !IS_ERR(dentry) && dentry->d_inode) {
@@ -2054,14 +2054,7 @@ static int walk_component(struct nameidata *nd, int flags)
 		err = follow_managed(&path, nd);
 		if (unlikely(err < 0))
 			return err;
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-		dentry = nd->path.dentry;
-		if (dentry->d_inode && susfs_is_inode_sus_path(dentry->d_inode)) {
-			// - No need to dput() here
-			// - return -ENOENT here since it is walking the sub path of sus path
-			return -ENOENT;
-		}
-#endif
+
 		if (unlikely(d_is_negative(path.dentry))) {
 			path_to_nameidata(&path, nd);
 			return -ENOENT;
@@ -2325,10 +2318,21 @@ static int link_path_walk(const char *name, struct nameidata *nd)
 	for(;;) {
 		u64 hash_len;
 		int type;
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+		struct dentry *dentry;
+#endif
 
 		err = may_lookup(nd);
 		if (err)
 			return err;
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+		dentry = nd->path.dentry;
+		if (dentry->d_inode && susfs_is_inode_sus_path(dentry->d_inode)) {
+			// - No need to dput() here
+			// - return -ENOENT here since it is walking the sub path of sus path
+			return -ENOENT;
+		}
+#endif
 
 		hash_len = hash_name(nd->path.dentry, name);
 
@@ -2516,6 +2520,7 @@ static inline int lookup_last(struct nameidata *nd)
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	nd->state |= ND_STATE_LOOKUP_LAST;
 #endif
+
 	nd->flags &= ~LOOKUP_PARENT;
 	return walk_component(nd, 0);
 }
@@ -3478,6 +3483,7 @@ static int lookup_open(struct nameidata *nd, struct path *path,
 	bool found_sus_path = false;
 	bool is_nd_state_open_last = (nd->state & ND_STATE_OPEN_LAST);
 #endif
+
 	if (unlikely(IS_DEADDIR(dir_inode)))
 		return -ENOENT;
 
@@ -3500,6 +3506,8 @@ static int lookup_open(struct nameidata *nd, struct path *path,
 	}
 #endif
 	dentry = d_lookup(dir, &nd->last);
+	for (;;) {
+		if (!dentry) {
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	if (is_nd_state_open_last && dentry && !IS_ERR(dentry) && dentry->d_inode) {
 		if (susfs_is_inode_sus_path(dentry->d_inode)) {
@@ -3509,14 +3517,6 @@ static int lookup_open(struct nameidata *nd, struct path *path,
 		}
 	}
 skip_orig_flow1:
-#endif
-	for (;;) {
-		if (!dentry) {
-#ifdef CONFIG_KSU_SUSFS_SUS_PATH
-			if (found_sus_path) {
-				dentry = d_alloc_parallel(dir, &susfs_fake_qstr_name, &wq);
-				goto skip_orig_flow2;
-			}
 #endif
 			dentry = d_alloc_parallel(dir, &nd->last, &wq);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
@@ -3647,6 +3647,7 @@ static int do_last(struct nameidata *nd,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	nd->state |= ND_STATE_OPEN_LAST;
 #endif
+
 	nd->flags &= ~LOOKUP_PARENT;
 	nd->flags |= op->intent;
 

@@ -32,7 +32,7 @@
 #include <linux/ima.h>
 #include <linux/dnotify.h>
 #include <linux/compat.h>
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
+#ifdef CONFIG_KSU_SUSFS
 #include <linux/susfs_def.h>
 #endif
 
@@ -343,9 +343,9 @@ SYSCALL_DEFINE4(fallocate, int, fd, int, mode, loff_t, offset, loff_t, len)
 	return ksys_fallocate(fd, mode, offset, len);
 }
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-extern bool susfs_is_sus_su_hooks_enabled __read_mostly;
-extern bool __ksu_is_allow_uid(uid_t uid);
+#ifdef CONFIG_KSU_SUSFS
+extern bool ksu_su_compat_enabled __read_mostly;
+extern bool __ksu_is_allow_uid_for_current(uid_t uid);
 extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user, int *mode,
 			int *flags);
 #endif
@@ -364,15 +364,15 @@ long do_faccessat(int dfd, const char __user *filename, int mode)
 	int res;
 	unsigned int lookup_flags = LOOKUP_FOLLOW;
 
-#ifdef CONFIG_KSU_SUSFS_SUS_SU
-	if (likely(susfs_is_current_proc_umounted())) {
+#ifdef CONFIG_KSU_SUSFS
+	if (likely(susfs_is_current_proc_umounted()) || !ksu_su_compat_enabled) {
 		goto orig_flow;
 	}
-	if (likely(susfs_is_sus_su_hooks_enabled) &&
-		unlikely(__ksu_is_allow_uid(current_uid().val)))
-	{
+
+	if (unlikely(__ksu_is_allow_uid_for_current(current_uid().val))) {
 		ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
 	}
+
 orig_flow:
 #endif
 
@@ -462,17 +462,8 @@ out:
 	return res;
 }
 
-#ifdef CONFIG_KSU
-__attribute__((hot)) 
-extern int ksu_handle_faccessat(int *dfd, const char __user **filename_user,
-				int *mode, int *flags);
-#endif
-
 SYSCALL_DEFINE3(faccessat, int, dfd, const char __user *, filename, int, mode)
 {
-#ifdef CONFIG_KSU
-	ksu_handle_faccessat(&dfd, &filename, &mode, NULL);
-#endif
 	return do_faccessat(dfd, filename, mode);
 }
 
@@ -1240,6 +1231,23 @@ SYSCALL_DEFINE1(close, unsigned int, fd)
 		retval = -EINTR;
 
 	return retval;
+}
+
+/**
+ * close_range() - Close all file descriptors in a given range.
+ *
+ * @fd:     starting file descriptor to close
+ * @max_fd: last file descriptor to close
+ * @flags:  reserved for future extensions
+ *
+ * This closes a range of file descriptors. All file descriptors
+ * from @fd up to and including @max_fd are closed.
+ * Currently, errors to close a given file descriptor are ignored.
+ */
+SYSCALL_DEFINE3(close_range, unsigned int, fd, unsigned int, max_fd,
+		unsigned int, flags)
+{
+	return __close_range(fd, max_fd, flags);
 }
 
 /*
