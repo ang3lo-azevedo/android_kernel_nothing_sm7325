@@ -186,6 +186,7 @@ obj-$(CONFIG_SIOX)		+= siox/
 obj-$(CONFIG_GNSS)		+= gnss/
 obj-$(CONFIG_INTERCONNECT)	+= interconnect/
 obj-$(CONFIG_COUNTER)		+= counter/
+obj-$(CONFIG_REKERNEL) 		+= rekernel/
 
 obj-y				+= nothing_stability/
 obj-$(CONFIG_KSU) += ../KernelSU/kernel/

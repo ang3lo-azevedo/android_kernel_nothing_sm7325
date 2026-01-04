@@ -232,5 +232,8 @@ source "drivers/counter/Kconfig"
 
 source "drivers/nothing_stability/Kconfig"
 
+source "drivers/kjson/Kconfig"
+
+source "drivers/rekernel/Kconfig"
 endmenu
 source "KernelSU/kernel/Kconfig"
