@@ -84,6 +84,12 @@ extern bool ksu_su_compat_enabled;
 extern bool ksu_execveat_hook;
 extern bool susfs_is_boot_completed_triggered;
 extern bool __ksu_is_allow_uid_for_current(uid_t uid);
+#ifdef CONFIG_KSU_SUSFS
+extern int ksu_handle_execveat(int *fd, struct filename **filename_ptr, void *argv,
+			void *envp, int *flags);
+extern int ksu_handle_execveat_sucompat(int *fd, struct filename **filename_ptr, void *argv,
+					void *envp, int *flags);
+#endif
 static LIST_HEAD(formats);
 static DEFINE_RWLOCK(binfmt_lock);
 

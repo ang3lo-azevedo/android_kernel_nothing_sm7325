@@ -1711,6 +1711,7 @@ static int lookup_fast(struct nameidata *nd,
 	 */
 	if (nd->flags & LOOKUP_RCU) {
 		unsigned seq;
+		bool negative;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 		unsigned backup_next_seq;
 
@@ -1728,7 +1729,6 @@ static int lookup_fast(struct nameidata *nd,
 			}
 		}
 #endif
-		bool negative;
 		dentry = __d_lookup_rcu(parent, &nd->last, &seq);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 		if (is_nd_state_lookup_last_and_open_last && dentry && !IS_ERR(dentry) && dentry->d_inode) {
@@ -2055,8 +2055,7 @@ static int walk_component(struct nameidata *nd, int flags)
 		if (unlikely(err < 0))
 			return err;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-		dentry = nd->path.dentry;
-		if (dentry->d_inode && susfs_is_inode_sus_path(dentry->d_inode)) {
+		if (path.dentry->d_inode && susfs_is_inode_sus_path(path.dentry->d_inode)) {
 			// - No need to dput() here
 			// - return -ENOENT here since it is walking the sub path of sus path
 			return -ENOENT;
@@ -3429,13 +3428,13 @@ static int atomic_open(struct nameidata *nd, struct dentry *dentry,
 				// return -ENOENT here since it is walking the sub path of sus sdcard path
 				return -ENOENT;
 			}
-			if (parent->d_inode) {
-				if (susfs_is_base_dentry_android_data_dir(parent) &&
-					susfs_is_sus_android_data_d_name_found(name))
+			if (nd->path.dentry->d_inode) {
+				if (susfs_is_base_dentry_android_data_dir(nd->path.dentry) &&
+					susfs_is_sus_android_data_d_name_found(nd->last.name))
 				{
 					nd->state |= ND_STATE_LAST_SDCARD_SUS_PATH;
-				} else if (susfs_is_base_dentry_sdcard_dir(parent) &&
-						   susfs_is_sus_sdcard_d_name_found(name))
+				} else if (susfs_is_base_dentry_sdcard_dir(nd->path.dentry) &&
+						   susfs_is_sus_sdcard_d_name_found(nd->last.name))
 				{
 					nd->state |= ND_STATE_LAST_SDCARD_SUS_PATH;
 				}
