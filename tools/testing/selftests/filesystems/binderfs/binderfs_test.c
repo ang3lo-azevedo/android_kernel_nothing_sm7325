@@ -147,10 +147,7 @@ static void __do_binderfs_test(void)
 	char device_path[sizeof("/dev/binderfs/") + BINDERFS_MAX_NAME];
 	static const char * const binder_features[] = {
 		"oneway_spam_detection",
-<<<<<<< HEAD
 		"freeze_notification",
-=======
->>>>>>> 8c4165a04351 (BACKPORT: selftests/binderfs: add test for feature files)
 	};
 
 	change_to_mountns();
