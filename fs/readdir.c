@@ -782,7 +782,6 @@ orig_flow:
 		return 0;
 	}
 	iput(inode);
-orig_flow:
 #endif
 	dirent = buf->current_dir;
 	if (__put_user(d_ino, &dirent->d_ino))
