@@ -373,12 +373,14 @@ SYSCALL_DEFINE3(getdents, unsigned int, fd,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	struct inode *inode;
 #endif
+
 	if (!access_ok(dirent, count))
 		return -EFAULT;
 
 	f = fdget_pos(fd);
 	if (!f.file)
 		return -EBADF;
+
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	buf.sb = f.file->f_inode->i_sb;
 	inode = f.file->f_path.dentry->d_inode;
@@ -511,12 +513,14 @@ int ksys_getdents64(unsigned int fd, struct linux_dirent64 __user *dirent,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	struct inode *inode;
 #endif
+
 	if (!access_ok(dirent, count))
 		return -EFAULT;
 
 	f = fdget_pos(fd);
 	if (!f.file)
 		return -EBADF;
+
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	buf.sb = f.file->f_inode->i_sb;
 	inode = f.file->f_path.dentry->d_inode;
@@ -698,12 +702,12 @@ struct compat_linux_dirent {
 struct compat_getdents_callback {
 	struct dir_context ctx;
 	struct compat_linux_dirent __user *current_dir;
+	struct compat_linux_dirent __user *previous;
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	struct super_block *sb;
 	bool is_base_dentry_android_data_root_dir;
 	bool is_base_dentry_sdcard_root_dir;
 #endif
-	struct compat_linux_dirent __user *previous;
 	int count;
 	int error;
 };
@@ -720,6 +724,7 @@ static int compat_filldir(struct dir_context *ctx, const char *name, int namlen,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	struct inode *inode;
 #endif
+
 	buf->error = -EINVAL;	/* only used if we fail.. */
 	if (reclen > buf->count)
 		return -EINVAL;
@@ -792,12 +797,14 @@ COMPAT_SYSCALL_DEFINE3(getdents, unsigned int, fd,
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	struct inode *inode;
 #endif
+
 	if (!access_ok(dirent, count))
 		return -EFAULT;
 
 	f = fdget_pos(fd);
 	if (!f.file)
 		return -EBADF;
+
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
 	buf.sb = f.file->f_inode->i_sb;
 	inode = f.file->f_path.dentry->d_inode;

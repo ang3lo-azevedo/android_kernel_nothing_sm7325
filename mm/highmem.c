@@ -369,6 +369,8 @@ void kunmap_high(struct page *page)
 }
 
 EXPORT_SYMBOL(kunmap_high);
+<<<<<<< HEAD
+=======
 #endif /* CONFIG_HIGHMEM */
 
 #ifdef CONFIG_KMAP_LOCAL
@@ -621,6 +623,7 @@ void kmap_local_fork(struct task_struct *tsk)
 		memset(&tsk->kmap_ctrl, 0, sizeof(tsk->kmap_ctrl));
 }
 
+>>>>>>> 3dd9806936d7 (mm/highmem: Provide kmap_local*)
 #endif
 
 #if defined(HASHED_PAGE_VIRTUAL)
