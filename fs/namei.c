@@ -3500,7 +3500,6 @@ skip_orig_flow1:
 #endif
 			dentry = d_alloc_parallel(dir, &nd->last, &wq);
 #ifdef CONFIG_KSU_SUSFS_SUS_PATH
-skip_orig_flow2:
 #endif
 			if (IS_ERR(dentry))
 				return PTR_ERR(dentry);

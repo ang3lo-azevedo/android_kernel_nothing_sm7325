@@ -298,7 +298,6 @@ static inline unsigned long walt_map_util_freq(unsigned long util,
 					unsigned long cap, int cpu)
 {
 	unsigned long fmax = sg_policy->policy->cpuinfo.max_freq;
-	unsigned int shift = sg_policy->tunables->target_load_shift;
 
 	int delta = util - sg_policy->prev_util;
 	u64 now = sched_clock();
@@ -475,8 +474,6 @@ static unsigned int get_next_freq(struct sugov_policy *sg_policy,
 	struct cpufreq_policy *policy = sg_policy->policy;
 	unsigned int freq = arch_scale_freq_invariant() ?
 				policy->cpuinfo.max_freq : policy->cur;
-	unsigned int idx, l_freq, h_freq;
-	unsigned long next_freq = 0;
 	unsigned int raw_freq, final_freq, map_freq;
 
 #ifdef CONFIG_OPLUS_FEATURE_SUGOV_TL
