@@ -1176,6 +1176,12 @@ fetch_store_string_user(unsigned long addr, void *dest, void *base)
 }
 
 static nokprobe_inline int
+probe_mem_read(void *dest, void *src, size_t size)
+{
+	return probe_kernel_read_strict(dest, src, size);
+}
+
+static nokprobe_inline int
 probe_mem_read_user(void *dest, void *src, size_t size)
 {
 	const void __user *uaddr =  (__force const void __user *)src;
