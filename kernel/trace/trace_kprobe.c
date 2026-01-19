@@ -1178,7 +1178,7 @@ fetch_store_string_user(unsigned long addr, void *dest, void *base)
 static nokprobe_inline int
 probe_mem_read(void *dest, void *src, size_t size)
 {
-	return probe_kernel_read_strict(dest, src, size);
+	return probe_kernel_read(dest, src, size);
 }
 
 static nokprobe_inline int
