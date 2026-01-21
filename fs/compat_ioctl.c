@@ -363,20 +363,8 @@ static int ppp_scompress(struct file *file, unsigned int cmd,
 }
 
 #ifdef CONFIG_BLOCK
-struct mtget32 {
-	compat_long_t	mt_type;
-	compat_long_t	mt_resid;
-	compat_long_t	mt_dsreg;
-	compat_long_t	mt_gstat;
-	compat_long_t	mt_erreg;
-	compat_daddr_t	mt_fileno;
-	compat_daddr_t	mt_blkno;
-};
 #define MTIOCGET32	_IOR('m', 2, struct mtget32)
 
-struct mtpos32 {
-	compat_long_t	mt_blkno;
-};
 #define MTIOCPOS32	_IOR('m', 3, struct mtpos32)
 
 static int mt_ioctl_trans(struct file *file,
