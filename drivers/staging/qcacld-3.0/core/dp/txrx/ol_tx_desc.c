@@ -375,6 +375,9 @@ ol_tx_desc_alloc_hl(struct ol_txrx_pdev_t *pdev,
 {
 	struct ol_tx_desc_t *tx_desc;
 
+	if (vdev->opmode == QDF_MONITOR_MODE)
+		msdu_info->htt.action.do_encrypt = 0;
+
 	tx_desc = ol_tx_desc_alloc_wrapper(pdev, vdev, msdu_info);
 	if (!tx_desc)
 		return NULL;
@@ -727,6 +730,8 @@ struct ol_tx_desc_t *ol_tx_desc_ll(struct ol_txrx_pdev_t *pdev,
 	}
 
 	/* allocate the descriptor */
+	if (vdev->opmode == QDF_MONITOR_MODE)
+		msdu_info->htt.action.do_encrypt = 0;
 	tx_desc = ol_tx_desc_alloc_wrapper(pdev, vdev, msdu_info);
 	if (!tx_desc)
 		return NULL;
@@ -849,6 +854,8 @@ ol_tx_desc_hl(
 	}
 
 	/* allocate the descriptor */
+	if (vdev->opmode == QDF_MONITOR_MODE)
+		msdu_info->htt.action.do_encrypt = 0;
 	tx_desc = ol_tx_desc_alloc_hl(pdev, vdev, msdu_info);
 	if (!tx_desc)
 		return NULL;
