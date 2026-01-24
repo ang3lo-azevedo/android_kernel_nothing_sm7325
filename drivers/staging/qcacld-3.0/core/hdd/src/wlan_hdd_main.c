@@ -8418,6 +8418,9 @@ void hdd_connect_result(struct net_device *dev, const u8 *bssid,
 			tSirResultCodes timeout_reason)
 {
 	struct hdd_adapter *adapter = netdev_priv(dev);
+	if (adapter->device_mode == QDF_MONITOR_MODE) {
+		return;
+	}
 	struct cfg80211_bss *bss = NULL;
 	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(adapter);
 
@@ -8455,6 +8458,9 @@ void hdd_connect_result(struct net_device *dev, const u8 *bssid,
 			tSirResultCodes timeout_reason)
 {
 	struct hdd_adapter *adapter = netdev_priv(dev);
+	if (adapter->device_mode == QDF_MONITOR_MODE) {
+                return;
+        }
 	struct hdd_context *hdd_ctx = WLAN_HDD_GET_CTX(adapter);
 
 	cfg80211_connect_result(dev, bssid, req_ie, req_ie_len,
