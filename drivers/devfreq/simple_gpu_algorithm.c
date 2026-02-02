@@ -17,7 +17,7 @@
  */
 #include <linux/module.h>
 #include <linux/devfreq.h>
-#include <linux/msm_adreno_devfreq.h>
+#include "../gpu/msm/msm_adreno_devfreq.h"
 #include <linux/io.h>
 
 static int default_laziness = 4;
@@ -34,7 +34,7 @@ static int laziness;
 int simple_gpu_algorithm(int level, int *val,
 			struct devfreq_msm_adreno_tz_data *priv)
 {
-	int ret;
+	int ret = 0;
 
 	/* sync memory before sending the commands */
 	__iowmb();
