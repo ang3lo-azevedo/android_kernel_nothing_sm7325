@@ -165,11 +165,6 @@ static int __maybe_unused max_kswapd_threads = MAX_KSWAPD_THREADS;
 static int neg_three = -3;
 #endif
 
-#ifdef CONFIG_SCHED_BORE
-static int __maybe_unused sixty_four = 64;
-static int __maybe_unused maxval_12_bits = 4095;
-#endif // CONFIG_SCHED_BORE
-static int three = 3;
 static int fifty = 50;
 static int two_hundred_fifty_five = 255;
 const int sched_user_hint_max = 1000;
@@ -185,7 +180,6 @@ static unsigned int two_hundred_million = 200000000;
  */
 static unsigned int min_cfs_boost_prio = 99;
 static unsigned int max_cfs_boost_prio = 119;
-#endif
 
 /* this is needed for the proc_doulongvec_minmax of vm_dirty_bytes */
 static unsigned long dirty_bytes_min = 2 * PAGE_SIZE;
@@ -3890,7 +3884,7 @@ int proc_douintvec_capacity(struct ctl_table *table, int write,
 
 #endif /* CONFIG_PROC_SYSCTL */
 
-#if defined(CONFIG_SYSCTL)
+#ifdef CONFIG_SCHED_BORE
 int proc_do_static_key(struct ctl_table *table, int write,
 		       void *buffer, size_t *lenp, loff_t *ppos)
 {
@@ -3920,7 +3914,7 @@ int proc_do_static_key(struct ctl_table *table, int write,
 	mutex_unlock(&static_key_mutex);
 	return ret;
 }
-#endif
+#endif /* CONFIG_SCHED_BORE */
 /*
  * No sense putting this after each symbol definition, twice,
  * exception granted :-)
