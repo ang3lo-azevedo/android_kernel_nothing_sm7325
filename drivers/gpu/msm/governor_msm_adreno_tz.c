@@ -24,6 +24,14 @@
 #include "../../devfreq/governor.h"
 #include "msm_adreno_devfreq.h"
 
+extern int kp_active_mode(void);
+
+#ifdef CONFIG_SIMPLE_GPU_ALGORITHM
+extern int simple_gpu_active;
+extern int simple_gpu_algorithm(int level, int *val,
+                                struct devfreq_msm_adreno_tz_data *priv);
+#endif
+
 static DEFINE_SPINLOCK(tz_lock);
 static DEFINE_SPINLOCK(sample_lock);
 static DEFINE_SPINLOCK(suspend_lock);

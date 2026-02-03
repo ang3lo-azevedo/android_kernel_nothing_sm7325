@@ -19,3 +19,5 @@ modules
 Module.symvers
 *.mod.c
 .cache.mk
+*pyc
+output/
