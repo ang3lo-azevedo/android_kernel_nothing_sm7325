@@ -112,13 +112,8 @@ static int show_vfsmnt(struct seq_file *m, struct vfsmount *mnt)
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	if (susfs_hide_sus_mnts_for_non_su_procs &&
-<<<<<<< HEAD
 		r->mnt_id >= DEFAULT_KSU_MNT_ID &&
 		!susfs_is_current_ksu_domain())
-=======
-			r->mnt_id >= DEFAULT_KSU_MNT_ID &&
-			!susfs_is_current_ksu_domain())
->>>>>>> 1602ce19be92 (fs: susfs: rename susfs_hide_sus_mnts_for_all_procs to susfs_hide_sus_mnts_for_non_su_procs)
 	{
 		return 0;
 	}
@@ -162,13 +157,8 @@ static int show_mountinfo(struct seq_file *m, struct vfsmount *mnt)
 
 #ifdef CONFIG_KSU_SUSFS_SUS_MOUNT
 	if (susfs_hide_sus_mnts_for_non_su_procs &&
-<<<<<<< HEAD
 		r->mnt_id >= DEFAULT_KSU_MNT_ID &&
 		!susfs_is_current_ksu_domain())
-=======
-			r->mnt_id >= DEFAULT_KSU_MNT_ID &&
-			!susfs_is_current_ksu_domain())
->>>>>>> 1602ce19be92 (fs: susfs: rename susfs_hide_sus_mnts_for_all_procs to susfs_hide_sus_mnts_for_non_su_procs)
 	{
 		return 0;
 	}
