@@ -1008,6 +1008,12 @@ static inline int may_follow_link(struct nameidata *nd)
 	if (!sysctl_protected_symlinks)
 		return 0;
 
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	if (nd->inode && unlikely(nd->inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		return -ENOENT;
+	}
+#endif
+
 	/* Allowed if owner and follower match. */
 	inode = nd->link_inode;
 	if (uid_eq(current_cred()->fsuid, inode->i_uid))
@@ -1088,6 +1094,12 @@ static int may_linkat(struct path *link)
 
 	if (!sysctl_protected_hardlinks)
 		return 0;
+
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	if (inode && unlikely(inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		return -ENOENT;
+	}
+#endif
 
 	/* Source inode owner (or CAP_FOWNER) can hardlink all they like,
 	 * otherwise, it must be a safe source.
@@ -2623,6 +2635,14 @@ int filename_lookup(int dfd, struct filename *name, unsigned flags,
 	if (likely(!retval))
 		audit_inode(name, path->dentry, 0);
 	restore_nameidata();
+
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	if (!retval && path->dentry->d_inode && unlikely(path->dentry->d_inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		putname(name);
+		return -ENOENT;
+	}
+#endif
+
 	putname(name);
 	return retval;
 }
@@ -3093,6 +3113,12 @@ static int may_delete(struct inode *dir, struct dentry *victim, bool isdir)
 
 	audit_inode_child(dir, victim, AUDIT_TYPE_CHILD_DELETE);
 
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	if (unlikely(inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		return -ENOENT;
+	}
+#endif
+
 	error = inode_permission(dir, MAY_WRITE | MAY_EXEC);
 	if (error)
 		return error;
@@ -3133,6 +3159,18 @@ static inline int may_create(struct inode *dir, struct dentry *child)
 		return -EEXIST;
 	if (IS_DEADDIR(dir))
 		return -ENOENT;
+
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	int error;
+	if (child->d_inode && unlikely(child->d_inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		error = inode_permission(dir, MAY_WRITE | MAY_EXEC);
+		if (error) {
+			return error;
+		}
+		return -ENOENT;
+	}
+#endif
+
 	s_user_ns = dir->i_sb->s_user_ns;
 	if (!kuid_has_mapping(s_user_ns, current_fsuid()) ||
 	    !kgid_has_mapping(s_user_ns, current_fsgid()))
@@ -3313,6 +3351,12 @@ static int may_open(const struct path *path, int acc_mode, int flag)
 	error = inode_permission(inode, MAY_OPEN | acc_mode);
 	if (error)
 		return error;
+
+#ifdef CONFIG_KSU_SUSFS_SUS_PATH
+	if (unlikely(inode->i_mapping->flags & BIT_SUS_PATH) && likely(susfs_is_current_proc_umounted())) {
+		return -ENOENT;
+	}
+#endif
 
 	/*
 	 * An append-only file must be opened in append mode for writing.
