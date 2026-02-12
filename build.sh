@@ -199,46 +199,55 @@ choose_action(){
 	done
 }
 
+# Function for "smart" installation
+pkg_install() {
+	if [ -f /etc/arch-release ]; then
+		[ -n "$1" ] && sudo pacman -S --needed --noconfirm "$1"
+	else
+		[ -n "$2" ] && sudo apt-get install -y "$2"
+	fi
+}
+
 # ---- Install packages ----
 install_packages(){
 	echo -e "${YELLOW}Starting package installation...${NC}"
 
-	sudo apt-get install -y bc
-	sudo apt-get install -y bison
-	sudo apt-get install -y build-essential
-	sudo apt-get install -y zstd
-	sudo apt-get install -y clang
-	sudo apt-get install -y lld
-	sudo apt-get install -y flex
-	sudo apt-get install -y gnupg
-	sudo apt-get install -y gperf
-	sudo apt-get install -y ccache
-	sudo apt-get install -y liblz4-tool
-	sudo apt-get install -y libsdl1.2-dev
-	sudo apt-get install -y libstdc++6
-	sudo apt-get install -y libxml2
-	sudo apt-get install -y libxml2-utils
-	sudo apt-get install -y pngcrush
-	sudo apt-get install -y schedtool
-	sudo apt-get install -y squashfs-tools
-	sudo apt-get install -y xsltproc
-	sudo apt-get install -y zlib1g-dev
-	sudo apt-get install -y libncurses5-dev
-	sudo apt-get install -y bzip2
-	sudo apt-get install -y git
-	sudo apt-get install -y gcc
-	sudo apt-get install -y g++
-	sudo apt-get install -y libssl-dev
-	sudo apt-get install -y openssl
-	sudo apt-get install -y gcc-aarch64-linux-gnu
-	sudo apt-get install -y llvm
-	sudo apt-get install -y python3-pip
-	sudo apt-get install -y cpio
-	sudo apt-get install -y binutils
-	sudo apt-get install -y zip
-	sudo apt-get install -y device-tree-compiler
-	sudo apt-get install -y default-jre
-	sudo apt-get install -y openjdk-21-jdk
+	# pkg_install "Назва в Arch" "Назва в Debian"
+	pkg_install "bc" "bc"
+	pkg_install "bison" "bison"
+	pkg_install "base-devel" "build-essential"
+	pkg_install "zstd" "zstd"
+	pkg_install "clang" "clang"
+	pkg_install "lld" "lld"
+	pkg_install "flex" "flex"
+	pkg_install "gnupg" "gnupg"
+	pkg_install "gperf" "gperf"
+	pkg_install "ccache" "ccache"
+	pkg_install "lz4" "liblz4-tool"
+	pkg_install "sdl12-compat" "libsdl1.2-dev"
+	pkg_install "libxml2" "libxml2"
+	pkg_install "" "libxml2-utils"
+	pkg_install "libpng" "pngcrush"
+	pkg_install "schedtool" "schedtool"
+	pkg_install "squashfs-tools" "squashfs-tools"
+	pkg_install "libxslt" "xsltproc"
+	pkg_install "zlib" "zlib1g-dev"
+	pkg_install "ncurses" "libncurses5-dev"
+	pkg_install "bzip2" "bzip2"
+	pkg_install "git" "git"
+	pkg_install "gcc" "gcc"
+	pkg_install "gcc" "g++"
+	pkg_install "openssl" "libssl-dev"
+	pkg_install "openssl" "openssl"
+	pkg_install "aarch64-linux-gnu-gcc" "gcc-aarch64-linux-gnu"
+	pkg_install "llvm" "llvm"
+	pkg_install "python-pip" "python3-pip"
+	pkg_install "cpio" "cpio"
+	pkg_install "binutils" "binutils"
+	pkg_install "zip" "zip"
+	pkg_install "dtc" "device-tree-compiler"
+	pkg_install "jdk21-openjdk" "default-jre"
+	pkg_install "jdk21-openjdk" "openjdk-21-jdk"
 
 	echo -e "${GREEN}Necessary packages successfully installed.${NC}"
 }
