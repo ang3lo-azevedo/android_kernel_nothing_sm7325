@@ -1,0 +1,34 @@
+/*this is for different project dtsi*/
+&qupv3_se0_i2c {
+
+    status = "ok";
+
+    mp2650-charger@5c {
+        status = "okay";
+        compatible = "oplus,mp2650-charger";
+        reg = <0x5c 0>;
+
+        qcom,mps_otg_en-gpio = <&pm8350c_gpios 1 0x00>;
+        pinctrl-names = "mps_otg_en_active", "mps_otg_en_sleep", "mps_otg_en_default";
+        pinctrl-0 = <&mps_otg_en_active>;
+        pinctrl-1 = <&mps_otg_en_sleep>;
+        pinctrl-2 = <&mps_otg_en_default>;
+    };
+};
+&reserved_memory {
+	/*
+	 * Lahaina have empty memory available at 0xb0000000 to 0xd0000000.
+	 * Carve ramoops out of that area.
+	 */
+	ramoops@b0000000 {
+		compatible   = "ramoops";
+		reg          = <0x00 0xb0000000 0x00 0x100000>;
+		ecc-size     = <16>;
+		record-size  = <0x100000>;
+		console-size = <0>;
+		ftrace-size  = <0>;
+		pmsg-size    = <0>;
+		max-reason   = <4>;
+		status       = "ok";
+    };
+};
