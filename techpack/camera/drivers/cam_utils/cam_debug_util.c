@@ -19,10 +19,10 @@ module_param(debug_type, uint, 0644);
 
 struct camera_debug_settings cam_debug;
 
-const struct camera_debug_settings *cam_debug_get_settings(void)
+/* const struct camera_debug_settings *cam_debug_get_settings(void)
 {
 	return &cam_debug;
-}
+} */
 
 static int cam_debug_parse_cpas_settings(const char *setting, u64 value)
 {
@@ -56,7 +56,7 @@ static int cam_debug_parse_cpas_settings(const char *setting, u64 value)
 	return 0;
 }
 
-ssize_t cam_debug_sysfs_node_store(struct device *dev,
+/* ssize_t cam_debug_sysfs_node_store(struct device *dev,
 		struct device_attribute *attr, const char *buf, size_t count)
 {
 	int rc = 0;
@@ -118,9 +118,9 @@ ssize_t cam_debug_sysfs_node_store(struct device *dev,
 error:
 	kfree(local_buf_temp);
 	return -EPERM;
-}
+} */
 
-const char *cam_get_module_name(unsigned int module_id)
+/* const char *cam_get_module_name(unsigned int module_id)
 {
 	const char *name = NULL;
 
@@ -224,7 +224,7 @@ const char *cam_get_module_name(unsigned int module_id)
 	}
 
 	return name;
-}
+} */
 
 const char *cam_get_tag_name(unsigned int tag_id)
 {
@@ -254,7 +254,7 @@ const char *cam_get_tag_name(unsigned int tag_id)
 	return name;
 }
 
-void cam_debug_log(unsigned int module_id, const char *func, const int line,
+/* void cam_debug_log(unsigned int module_id, const char *func, const int line,
 	const char *fmt, ...)
 {
 	if (debug_mdl & module_id) {
@@ -283,9 +283,9 @@ void cam_debug_log(unsigned int module_id, const char *func, const int line,
 
 		va_end(args);
 	}
-}
+} */
 
-void cam_debug_trace(unsigned int tag, unsigned int module_id,
+/* void cam_debug_trace(unsigned int tag, unsigned int module_id,
 	const char *func, const int line, const char *fmt, ...)
 {
 	char str_buffer[STR_BUFFER_MAX_LENGTH];
@@ -306,4 +306,4 @@ void cam_debug_trace(unsigned int tag, unsigned int module_id,
 
 		va_end(args);
 	}
-}
+} */
