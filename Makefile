@@ -596,13 +596,16 @@ CLANG_FLAGS	+= --target=$(notdir $(CROSS_COMPILE:%-=%))
 endif # CROSS_COMPILE
 
 ifeq ($(LLVM_IAS),0)
-CLANG_FLAGS	+= -no-integrated-as
+CLANG_FLAGS    += -no-integrated-as
 GCC_TOOLCHAIN_DIR := $(dir $(shell which $(CROSS_COMPILE)elfedit))
-CLANG_FLAGS	+= --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
+CLANG_FLAGS    += --prefix=$(GCC_TOOLCHAIN_DIR)$(notdir $(CROSS_COMPILE))
 endif
-CLANG_FLAGS	+= -Werror=unknown-warning-option
-KBUILD_CPPFLAGS	+= $(CLANG_FLAGS)
-export CLANG_FLAGS
+CLANG_FLAGS    += -Werror=unknown-warning-option
+
+# ADD THIS LINE HERE:
+CLANG_FLAGS    += -isystem $(shell $(CC) -print-file-name=include)
+
+KBUILD_CPPFLAGS    += $(CLANG_FLAGS)
 endif
 
 ifdef config-build
