@@ -321,11 +321,11 @@ TRACE_EVENT(binder_update_page_range,
 		__field(size_t, size)
 	),
 	TP_fast_assign(
-		__entry->proc = alloc->pid;
-		__entry->allocate = allocate;
-		__entry->offset = start - (unsigned long)alloc->buffer;
-		__entry->size = end - start;
-	),
+        __entry->proc = alloc->pid;
+        __entry->allocate = allocate;
+        __entry->offset = (unsigned long)start - (unsigned long)alloc->buffer;
+        __entry->size = end - start;
+    ),
 	TP_printk("proc=%d allocate=%d offset=%zu size=%zu",
 		  __entry->proc, __entry->allocate,
 		  __entry->offset, __entry->size)
