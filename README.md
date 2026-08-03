@@ -1,182 +1,38 @@
-# How do I submit patches to Android Common Kernels
+# Kernel for Nothing Phone (1) (Spacewar)
 
-1. BEST: Make all of your changes to upstream Linux. If appropriate, backport to the stable releases.
-   These patches will be merged automatically in the corresponding common kernels. If the patch is already
-   in upstream Linux, post a backport of the patch that conforms to the patch requirements below.
+Linux 5.4.302 kernel based on [William24hmar's KSU-SUSFS](https://github.com/William24hmar/nothing_android_kernel_sm7325/tree/KSU-SUSFS) branch with NetHunter, USB gadget, and performance additions.
 
-2. LESS GOOD: Develop your patches out-of-tree (from an upstream Linux point-of-view). Unless these are
-   fixing an Android-specific bug, these are very unlikely to be accepted unless they have been
-   coordinated with kernel-team@android.com. If you want to proceed, post a patch that conforms to the
-   patch requirements below.
+## Source History
 
-# Common Kernel patch requirements
+| Base | Source |
+|------|--------|
+| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `KSU-SUSFS` | KSU syscall tamper, full SUSFS |
+| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | NetHunter Kconfig and driver configs |
+| [rodrig20](https://github.com/rodrig20/moonwake_kernel_xiaomi_ruby) `moon` | USB gadget reconfig, HID keyboard descriptor |
 
-- All patches must conform to the Linux kernel coding standards and pass `script/checkpatch.pl`
-- Patches shall not break gki_defconfig or allmodconfig builds for arm, arm64, x86, x86_64 architectures
-(see  https://source.android.com/setup/build/building-kernels)
-- If the patch is not merged from an upstream branch, the subject must be tagged with the type of patch:
-`UPSTREAM:`, `BACKPORT:`, `FROMGIT:`, `FROMLIST:`, or `ANDROID:`.
-- All patches must have a `Change-Id:` tag (see https://gerrit-review.googlesource.com/Documentation/user-changeid.html)
-- If an Android bug has been assigned, there must be a `Bug:` tag.
-- All patches must have a `Signed-off-by:` tag by the author and the submitter
+## Features
 
-Additional requirements are listed below based on patch type
+- **KernelSU** with syscall tamper, Throne Tracker always threaded
+- **SUSFS** full support (sus_path, sus_mount, sus_kstat, try_umount, spoof_uname, hide_symbols, open_redirect, sus_map)
+- **NetHunter** support: Wi-Fi monitor mode (mac80211, RTL8XXXU), WireGuard, HID gamepad (Dragonrise, Nintendo, Sony, Playstation, Pantherlord, Greenasia), USB networking, PPP/VPN, USB serial (PL2303, FTDI, CP210X), PWRKEY sync
+- **NoMount** security hardening
+- **MPTCP** multipath TCP
+- **Baseband-Guard** LSM for modem security
+- **Dead code elimination** and power efficient workqueues
+- **LTO + O3** optimizations
+- **WALT** scheduler + **F2FS** with security
+- **CASS** scheduler + **BBR** default TCP
+- **USB gadget** reconfiguration and proper HID keyboard descriptor
 
-## Requirements for backports from mainline Linux: `UPSTREAM:`, `BACKPORT:`
+## Build Config
 
-- If the patch is a cherry-pick from Linux mainline with no changes at all
-    - tag the patch subject with `UPSTREAM:`.
-    - add upstream commit information with a `(cherry-picked from ...)` line
-    - Example:
-        - if the upstream commit message is
 ```
-        important patch from upstream
-
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-```
-        - then Joe Smith would upload the patch for the common kernel as
-```
-        UPSTREAM: important patch from upstream
-
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-
-        Bug: 135791357
-        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01
-        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)
-        Signed-off-by: Joe Smith <joe.smith@foo.org>
+TARGET_KERNEL_CONFIG := vendor/lahaina-qgki_defconfig vendor/debugfs.config
 ```
 
-- If the patch requires any changes from the upstream version, tag the patch with `BACKPORT:`
-instead of `UPSTREAM:`.
-    - use the same tags as `UPSTREAM:`
-    - add comments about the changes under the `(cherry-picked from ...)` line
-    - Example:
-```
-        BACKPORT: important patch from upstream
+## Credits
 
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-
-        Bug: 135791357
-        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01
-        (cherry-picked from c31e73121f4c1ec41143423ac6ce3ce6dafdcec1)
-        [ Resolved minor conflict in drivers/foo/bar.c ]
-        Signed-off-by: Joe Smith <joe.smith@foo.org>
-```
-
-## Requirements for other backports: `FROMGIT:`, `FROMLIST:`,
-
-- If the patch has been merged into an upstream maintainer tree, but has not yet
-been merged into Linux mainline
-    - tag the patch subject with `FROMGIT:`
-    - add info on where the patch came from as `(cherry picked from commit <sha1> <repo> <branch>)`. This
-must be a stable maintainer branch (not rebased, so don't use `linux-next` for example).
-    - if changes were required, use `BACKPORT: FROMGIT:`
-    - Example:
-        - if the commit message in the maintainer tree is
-```
-        important patch from upstream
-
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-```
-        - then Joe Smith would upload the patch for the common kernel as
-```
-        FROMGIT: important patch from upstream
-
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-
-        Bug: 135791357
-        (cherry picked from commit 878a2fd9de10b03d11d2f622250285c7e63deace
-         https://git.kernel.org/pub/scm/linux/kernel/git/foo/bar.git test-branch)
-        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01
-        Signed-off-by: Joe Smith <joe.smith@foo.org>
-```
-
-
-- If the patch has been submitted to LKML, but not accepted into any maintainer tree
-    - tag the patch subject with `FROMLIST:`
-    - add a `Link:` tag with a link to the submittal on lore.kernel.org
-    - if changes were required, use `BACKPORT: FROMLIST:`
-    - Example:
-```
-        FROMLIST: important patch from upstream
-
-        This is the detailed description of the important patch
-
-        Signed-off-by: Fred Jones <fred.jones@foo.org>
-
-        Bug: 135791357
-        Link: https://lore.kernel.org/lkml/20190619171517.GA17557@someone.com/
-        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01
-        Signed-off-by: Joe Smith <joe.smith@foo.org>
-```
-
-## Requirements for Android-specific patches: `ANDROID:`
-
-- If the patch is fixing a bug to Android-specific code
-    - tag the patch subject with `ANDROID:`
-    - add a `Fixes:` tag that cites the patch with the bug
-    - Example:
-```
-        ANDROID: fix android-specific bug in foobar.c
-
-        This is the detailed description of the important fix
-
-        Fixes: 1234abcd2468 ("foobar: add cool feature")
-        Change-Id: I4caaaa566ea080fa148c5e768bb1a0b6f7201c01
-        Signed-off-by: Joe Smith <joe.smith@foo.org>
-```
-
-- If the patch is a new feature
-    - tag the patch subject with `ANDROID:`
-    - add a `Bug:` tag with the Android bug (required for android-specific features)
-
-# Vibrator driver for HHG device
-## How to merge the driver into kernel source tree
-
- 1. Copy \${this_project}/drivers/hid/hid-aksys.c into \${your_kernel_root}/drivers/hid/
-
- 2. Compare and merge \${this_project}/drivers/hid/hid-ids.h into \${your_kernel_root}/drivers/hid/hid-ids.h :
- Add the following code before the last line of this file
-
-    ```c
-		#define USB_VENDER_ID_QUALCOMM  0x0a12
-		#define USB_VENDER_ID_TEMP_HHG_AKSY 0x1234
-		#define USB_PRODUCT_ID_AKSYS_HHG  0x1000
-    ```
-
- 3. Merge \${this_project}/drivers/hid/Kconfig into \${your_kernel_root}/drivers/hid/Kconfig :
-Add the following code before the last line of this file
-
-		config HID_AKSYS_QRD
-    		tristate "AKSys gamepad USB adapter support"
-    		depends on HID
-    		---help---
-    		Support for AKSys gamepad USB adapter
-
-    	config AKSYS_QRD_FF
-    		bool "AKSys gamepad USB adapter force feedback support"
-    		depends on HID_AKSYS_QRD
-    		select INPUT_FF_MEMLESS
-    		---help---
-    		Say Y here if you have a AKSys gamepad USB adapter and want to
-    		enable force feedback support for it.
-    		
- 4. Merge \${this_project}/drivers/hid/Makefile into \${your_kernel_root}/drivers/hid/Makefile :
- Add the following code at the end of this file
-
-		obj-$(CONFIG_HID_AKSYS_QRD)	+= hid-aksys.o
-		
- 5. Modify your kernel's default build configuration file. Add the following two lines:
-
-        CONFIG_HID_AKSYS_QRD=m
-        CONFIG_AKSYS_QRD_FF=y
+- [William24hmar](https://github.com/William24hmar) - KSU-SUSFS and Nethunter kernel bases
+- [backslashxx](https://github.com/backslashxx) - KernelSU syscall tamper
+- [rodrig20](https://github.com/rodrig20) - USB gadget reconfiguration and HID keyboard descriptor
+- [simonpunk](https://gitlab.com/simonpunk/susfs4ksu) - SUSFS
