@@ -9,7 +9,6 @@ Linux 5.4.302 kernel based on [William24hmar's KSU-SUSFS](https://github.com/Wil
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `KSU-SUSFS` | KSU syscall tamper, full SUSFS, CASS, BBR |
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | NetHunter Kconfig and driver configs |
 | [rodrig20](https://github.com/rodrig20/moonwake_kernel_xiaomi_ruby) `moon` | USB gadget reconfig, HID keyboard descriptor |
-| [iplaynasty](https://github.com/iplaynasty/nothing_android_kernel_sm7325) `Staging-rom` | Focaltech touchscreen FB/DRM fix |
 
 ## Features
 
@@ -23,7 +22,6 @@ Linux 5.4.302 kernel based on [William24hmar's KSU-SUSFS](https://github.com/Wil
 - **Dead code elimination** and power efficient workqueues
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS** with security
 - **USB gadget** reconfiguration and proper HID keyboard descriptor
-- Focaltech touchscreen driver DRM/FB fix (from iplaynasty's Staging-rom)
 
 ## Build Config
 
