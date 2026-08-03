@@ -22,6 +22,8 @@ Linux 5.4.302 kernel based on [William24hmar's KSU-SUSFS](https://github.com/Wil
 - **Dead code elimination** and power efficient workqueues
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS** with security
 - **USB gadget** reconfiguration and proper HID keyboard descriptor
+- SUSFS confirmed working (susfs_sdcard_monitor, try_umount, spoof_uname, open_redirect)
+- UDC controllers available (a600000.dwc3, dummy_udc, usbip-vudc)
 
 ## Build Config
 
