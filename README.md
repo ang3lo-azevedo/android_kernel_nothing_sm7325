@@ -1,14 +1,14 @@
 # Kernel for Nothing Phone (1) (Spacewar)
 
-Linux 5.4.302 kernel for the Nothing Phone (1), based on William24hmar's NetHunter branch with Staging-1 features and USB gadget improvements.
+Linux 5.4.302 kernel with upstream RCU 5.15 backports, scheduler 6.1, BBRv3, and NetHunter support.
 
 ## Source History
 
 | Base | Branch | Source |
 |------|--------|--------|
-| William24hmar | Lineage-Rom | RCU 5.15, scheduler 6.1, BBRv3, TCP, net/audio fixes NetHunter, Wi-Fi monitor mode, HID injection, SUSFS |
-| William24hmar | Staging-1 | NoMount, BORE, MPTCP, Baseband-Guard, BBGUARD, NoMount, Baseband-Guard, MPTCP, BBR default TCP |
-| rodrig20 | `moonwake/moon` | USB gadget reconfiguration, proper HID keyboard descriptor |
+| William24hmar | `Lineage-Rom` | RCU 5.15, scheduler 6.1, BBRv3, SUSFS, net/audio fixes |
+| William24hmar | `Staging-1` | NoMount, BORE, MPTCP, Baseband-Guard |
+| rodrig20 | `moonwake/moon` | USB gadget reconfiguration, HID keyboard descriptor |
 
 ## Features
 
@@ -16,24 +16,20 @@ Linux 5.4.302 kernel for the Nothing Phone (1), based on William24hmar's NetHunt
 - **SUSFS 2.2.0** (sus_path, sus_mount, sus_kstat, try_umount, spoof_uname, open_redirect)
 - **NoMount** support
 - **Baseband-Guard** LSM for modem security
-- **BBR** as default TCP congestion control
+- **BBRv3** as default TCP congestion control
+- **Scheduler 6.1 mainline** + BORE + CASS
+- **RCU 5.15** backports (boost, lazy, nocb, fast nohz)
 - **MPTCP** (Multipath TCP)
-- **BORE** and **CASS** schedulers
-- **IRQ balance** tuning
-- **RCU_BOOST** + **RCU_LAZY** for performance
-- **LTO + O3** optimizations with dead code elimination
+- **IRQ balance** tuning with CPU exclusions
+- **Dead code elimination** (DCE)
+- **LTO + O3** optimizations
 - **WALT** scheduler
 - **F2FS** with security
 
-### Kali NetHunter
+### USB Gadget
 
-- **Wi-Fi monitor mode** and packet injection (mac80211, RTL8188EUS, RTL8812AU, RTL8814AU)
-- **HID keyboard/mouse attacks** (USB gadget configfs)
-- **USB gadget reconfiguration** (unregister current gadget for reconfig)
-- **Proper HID keyboard report descriptor**
-- **HID gamepad support** (Sony Playstation, Nintendo, Dragonrise, Pantherlord)
-- **WireGuard** VPN
-- **USB networking** (RTL8150/8152, CDC_EEM, AQC111)
+- USB gadget reconfiguration (unregister current gadget for reconfig)
+- Proper HID keyboard report descriptor (full Boot Keyboard descriptor)
 
 ## Build Config
 
@@ -43,7 +39,7 @@ TARGET_KERNEL_CONFIG := vendor/lahaina-qgki_defconfig vendor/debugfs.config
 
 ## Credits
 
-- [William24hmar](https://github.com/William24hmar) - NetHunter and Staging-1 kernel bases
-- [rodrig20](https://github.com/rodrig20) - USB gadget improvements
+- [William24hmar](https://github.com/William24hmar) - Lineage-Rom and Staging-1 kernel bases
+- [rodrig20](https://github.com/rodrig20) - USB gadget reconfiguration and HID keyboard descriptor
 - [simonpunk](https://gitlab.com/simonpunk/susfs4ksu) - SUSFS
 - [KernelSU](https://github.com/tiann/KernelSU) - kernel-based root
