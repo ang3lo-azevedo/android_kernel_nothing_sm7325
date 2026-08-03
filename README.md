@@ -43,3 +43,4 @@ TARGET_KERNEL_CONFIG := vendor/lahaina-qgki_defconfig vendor/debugfs.config
 - [rodrig20](https://github.com/rodrig20) - USB gadget reconfiguration and HID keyboard descriptor
 - [simonpunk](https://gitlab.com/simonpunk/susfs4ksu) - SUSFS
 - [KernelSU](https://github.com/tiann/KernelSU) - kernel-based root
+| William24hmar | `Nethunter` | NetHunter Kconfig and driver configs |
