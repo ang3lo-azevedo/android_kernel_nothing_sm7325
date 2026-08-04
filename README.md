@@ -16,10 +16,9 @@ Linux 5.4.302 kernel based on [William24hmar's KSU-SUSFS](https://github.com/Wil
 - **SUSFS** full support (sus_path, sus_mount, sus_kstat, try_umount, spoof_uname, hide_symbols, open_redirect, sus_map)
 - **CASS** scheduler + **BBR** default TCP
 - **NetHunter** support: Wi-Fi monitor mode (mac80211, RTL8XXXU), WireGuard, HID gamepad (Dragonrise, Nintendo, Sony, Playstation, Pantherlord, Greenasia), USB networking, PPP/VPN, USB serial (PL2303, FTDI, CP210X)
-- **NoMount** security hardening
-- **MPTCP** multipath TCP
-- **Baseband-Guard** LSM for modem security
-- **Dead code elimination** and power efficient workqueues
+- **NoMount** (removed - no source code in KSU-SUSFS base)
+- **MPTCP** multipath TCP (mainline kernel feature)
+- **Dead code elimination** and power efficient workqueues (mainline)
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS** with security
 - **USB gadget** reconfiguration and proper HID keyboard descriptor
 - SUSFS confirmed working (susfs_sdcard_monitor, try_umount)
