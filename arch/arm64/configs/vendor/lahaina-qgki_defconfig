@@ -1038,9 +1038,8 @@ CONFIG_USB_SERIAL_CP210X=y
 
 
 # VoltageOS additions
-CONFIG_NOMOUNT=y
 CONFIG_MPTCP=y
-CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf,baseband_guard"
+CONFIG_LSM="lockdown,yama,loadpin,safesetid,integrity,selinux,smack,tomoyo,apparmor,bpf"
 CONFIG_LD_DEAD_CODE_DATA_ELIMINATION=y
 CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y
 
