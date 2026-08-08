@@ -24,15 +24,15 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and
 - **CASS** scheduler + **BBR** default TCP congestion control
 - **NetHunter**: Wi-Fi monitor mode (mac80211, RTL8XXXU), WireGuard, HID gamepad (Dragonrise, Nintendo, Sony, Playstation, Pantherlord, Greenasia), USB networking, PPP/VPN, USB serial (PL2303, FTDI, CP210X)
 - **MPTCP** multipath TCP support
-- **Re:Kernel** — converts file_operations to proc_ops for /proc file compatibility
-- **Critical task boost** — binder PI bypass, sync wakeup, workqueue priority, rcu_hurry for smoother UI under load
-- **Security fixes** — CVE-2026-43499 (rtmutex UAF), binder UAF, af_unix UAF, ext4 LOGFLUSH
-- **TCP data-race annotations** — prevents race conditions in tp counters and dsack
-- **NF tables ranged sets** — multi-field firewall rule support
-- **Log silencing** — USB, IPC, serial, media, display driver log spam reduction
-- **Droidspaces / Docker** — full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems, full cone NAT
-- **TLB batched shootdown** — faster memory management on arm64, better container performance
-- **RPM-SMD deadlock fix** — prevents system hang when waiting for RPM acknowledgment
+- **Re:Kernel** - converts file_operations to proc_ops for /proc file compatibility
+- **Critical task boost** - binder PI bypass, sync wakeup, workqueue priority, rcu_hurry for smoother UI under load
+- **Security fixes** - CVE-2026-43499 (rtmutex UAF), binder UAF, af_unix UAF, ext4 LOGFLUSH
+- **TCP data-race annotations** - prevents race conditions in tp counters and dsack
+- **NF tables ranged sets** - multi-field firewall rule support
+- **Log silencing** - USB, IPC, serial, media, display driver log spam reduction
+- **Droidspaces / Docker** - full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems, full cone NAT
+- **TLB batched shootdown** - faster memory management on arm64, better container performance
+- **RPM-SMD deadlock fix** - prevents system hang when waiting for RPM acknowledgment
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS**
 - Dead code elimination and power efficient workqueues
 - Focaltech touchscreen DRM/FB fix (compile fix for KSU-SUSFS defconfig)
