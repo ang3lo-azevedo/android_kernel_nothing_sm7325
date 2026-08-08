@@ -190,15 +190,6 @@ static int rekernel_unit_show(struct seq_file* m, void* v) {
 	seq_printf(m, "%d\n", netlink_unit);
 	return LINE_SUCCESS;
 }
-static int rekernel_unit_open(struct inode* inode, struct file* file) {
-	return single_open(file, rekernel_unit_show, NULL);
-}
-static const struct proc_ops rekernel_unit_fops = {
-	.proc_open = rekernel_unit_open,
-	.proc_read = seq_read,
-	.proc_lseek = seq_lseek,
-	.proc_release = single_release
-};
 #endif /* CONFIG_PROC_FS */
 // init
 static int start_rekernel(void) {
@@ -231,7 +222,7 @@ static int start_rekernel(void) {
 	} else {
 		char buff[32];
 		sprintf(buff, "%d", netlink_unit);
-		rekernel_unit_entry = proc_create(buff, 0644, rekernel_dir, &rekernel_unit_fops);
+		rekernel_unit_entry = proc_create_single(buff, 0644, rekernel_dir, rekernel_unit_show);
 		if (!rekernel_unit_entry) {
 			pr_err("create rekernel unit failed!\n");
 		}
