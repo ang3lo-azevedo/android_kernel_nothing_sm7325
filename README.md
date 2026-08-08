@@ -51,3 +51,4 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Eric Dumazet](https://github.com/edumazet) - TCP data-race annotations
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
 - [nullptr-t-oss](https://github.com/nullptr-t-oss) / [lateautumn233](https://github.com/lateautumn233) - Droidspaces GKI kABI patches
+- [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
