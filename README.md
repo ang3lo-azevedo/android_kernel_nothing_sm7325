@@ -1,6 +1,6 @@
 # Kernel for Nothing Phone (1) (Spacewar)
 
-Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, and performance features.
+Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and performance features.
 
 ## Source History
 
@@ -11,6 +11,7 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, and performance feature
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `module` | Re:Kernel proc_ops, NF tables ranged sets, log silencing |
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Test` | Critical task boost, security fixes, TCP data-race annotations |
 | [maxsteeel](https://github.com/maxsteeel/nomount) | NoMount path redirection subsystem (5.4 kernel integration) |
+| [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS) | GKI kABI patches (SYSVIPC, POSIX_MQUEUE), Droidspaces/Docker kernel configs |
 
 ## Features
 
@@ -26,6 +27,7 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, and performance feature
 - **TCP data-race annotations** — prevents race conditions in tp counters and dsack
 - **NF tables ranged sets** — multi-field firewall rule support
 - **Log silencing** — USB, IPC, serial, media, display driver log spam reduction
+- **Droidspaces / Docker** — full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS**
 - Dead code elimination and power efficient workqueues
 - Focaltech touchscreen DRM/FB fix (compile fix for KSU-SUSFS defconfig)
@@ -48,3 +50,4 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Jann Horn](https://github.com/thejh) - af_unix UAF fix
 - [Eric Dumazet](https://github.com/edumazet) - TCP data-race annotations
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
+- [nullptr-t-oss](https://github.com/nullptr-t-oss) / [lateautumn233](https://github.com/lateautumn233) - Droidspaces GKI kABI patches
