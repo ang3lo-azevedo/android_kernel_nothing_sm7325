@@ -10,6 +10,9 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | NetHunter Kconfig and driver configs |
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `module` | Re:Kernel proc_ops, NF tables ranged sets, log silencing |
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Test` | Critical task boost, security fixes, TCP data-race annotations |
+| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `20260807-Bak` | TLB batched shootdown (arm64 memory management optimization) |
+| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `20260805-bak` | Binder transaction logging, RPM-SMD deadlock fix |
+| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | Full cone NAT, IPVS conntrack integration, xt_ipvs matcher |
 | [maxsteeel](https://github.com/maxsteeel/nomount) | NoMount path redirection subsystem (5.4 kernel integration) |
 | [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS) | GKI kABI patches (SYSVIPC, POSIX_MQUEUE), Droidspaces/Docker kernel configs |
 
@@ -27,7 +30,9 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and
 - **TCP data-race annotations** — prevents race conditions in tp counters and dsack
 - **NF tables ranged sets** — multi-field firewall rule support
 - **Log silencing** — USB, IPC, serial, media, display driver log spam reduction
-- **Droidspaces / Docker** — full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems
+- **Droidspaces / Docker** — full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems, full cone NAT
+- **TLB batched shootdown** — faster memory management on arm64, better container performance
+- **RPM-SMD deadlock fix** — prevents system hang when waiting for RPM acknowledgment
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS**
 - Dead code elimination and power efficient workqueues
 - Focaltech touchscreen DRM/FB fix (compile fix for KSU-SUSFS defconfig)
@@ -52,3 +57,5 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
 - [nullptr-t-oss](https://github.com/nullptr-t-oss) / [lateautumn233](https://github.com/lateautumn233) - Droidspaces GKI kABI patches
 - [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
+- [Madara273](https://github.com/Madara273) - Full cone NAT, IPVS conntrack, MPTCP
+- [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS integration
