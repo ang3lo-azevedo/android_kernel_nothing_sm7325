@@ -57,5 +57,4 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
 - [nullptr-t-oss](https://github.com/nullptr-t-oss) / [lateautumn233](https://github.com/lateautumn233) - Droidspaces GKI kABI patches
 - [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
-- [Madara273](https://github.com/Madara273) - Full cone NAT, IPVS conntrack, MPTCP
-- [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS integration
+- [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS conntrack, xt_ipvs matcher
