@@ -30,9 +30,9 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and
 - **TCP data-race annotations** - prevents race conditions in tp counters and dsack
 - **NF tables ranged sets** - multi-field firewall rule support
 - **Log silencing** - USB, IPC, serial, media, display driver log spam reduction
-- **Droidspaces / Docker** - full container runtime support: all Linux namespaces (PID, IPC, UTS, NET, USER), cgroups v1+v2, seccomp+BPF filter, overlayfs, veth/bridge/netfilter NAT, nf_tables, IPVS, MACVLAN/IPVLAN/VXLAN, NFS/CIFS/9P filesystems, full cone NAT
-- **TLB batched shootdown** - faster memory management on arm64, better container performance
-- **RPM-SMD deadlock fix** - prevents system hang when waiting for RPM acknowledgment
+- **Droidspaces / Docker** - container runtime support: Linux namespaces (PID, IPC, UTS, USER), cgroups (device, pids, net_prio), devtmpfs, bridge netfilter, NAT masquerade
+- **TLB batched shootdown** - faster memory management on arm64
+- **RPM-SMD deadlock fix** - prevents hang when waiting for RPM ACK
 - **LTO + O3** optimizations, **WALT** scheduler, **F2FS**
 - Dead code elimination and power efficient workqueues
 - Focaltech touchscreen DRM/FB fix (compile fix for KSU-SUSFS defconfig)
