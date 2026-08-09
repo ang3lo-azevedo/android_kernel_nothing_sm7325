@@ -14,7 +14,7 @@ Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `20260805-bak` | Binder transaction logging, RPM-SMD deadlock fix |
 | [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | Full cone NAT, IPVS conntrack integration, xt_ipvs matcher |
 | [maxsteeel](https://github.com/maxsteeel/nomount) | NoMount path redirection subsystem (5.4 kernel integration) |
-| [Droidspaces](https://github.com/ravindu644/Droidspaces-OSS) | GKI kABI patches (SYSVIPC, POSIX_MQUEUE), Droidspaces/Docker kernel configs |
+| [ExTV](https://github.com/ExTV) `DroidSpace` | Droidspaces/Docker namespace and container configs |
 
 ## Features
 
@@ -55,6 +55,5 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Jann Horn](https://github.com/thejh) - af_unix UAF fix
 - [Eric Dumazet](https://github.com/edumazet) - TCP data-race annotations
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
-- [nullptr-t-oss](https://github.com/nullptr-t-oss) / [lateautumn233](https://github.com/lateautumn233) - Droidspaces GKI kABI patches
 - [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
 - [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS conntrack, xt_ipvs matcher
