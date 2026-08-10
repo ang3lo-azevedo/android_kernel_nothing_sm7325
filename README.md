@@ -57,3 +57,31 @@ KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk
 - [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
 - [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
 - [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS conntrack, xt_ipvs matcher
+
+## Build Fixes
+
+- **ANDROID_PARANOID_NETWORK=n** — causes bootloop on QGKI 5.4, must stay enabled
+- **proc_create_single** — 5.4 compat wrapper for Re:Kernel proc_ops conversion
+- **IPVS conntrack** — duplicate symbol removal
+- **inode_lock_killable** — helper function backports for 5.4
+- **kjson** — Kconfig reference removal (not present on 5.4 QGKI)
+
+## Known Issues
+
+| Issue | Status |
+|-------|--------|
+| SYSVIPC / POSIX_MQUEUE | kABI patches cause bootloop on 5.4 QGKI (isolated, unfixed) |
+| Device-as-Webcam (UVC) | QTI 5.4 kernel USB gadget limitation |
+| Portrait mode (Nothing Camera) | Requires factory persist calibration from stock NOS |
+
+## Branches
+
+| Branch | Description |
+|--------|-------------|
+| `voltage-nethunter` | Main (KSU-SUSFS + NetHunter + Droidspaces + ~41 cherry-picks) |
+| `voltage` | A16 production |
+| `voltage-lr` | Long-running test |
+
+## Maintainer
+
+Ângelo Azevedo
