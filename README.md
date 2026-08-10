@@ -1,59 +1,60 @@
-# Kernel for Nothing Phone (1) (Spacewar)
+# Kernel: Nothing Phone (1) — Spacewar
 
-Linux 5.4.302 kernel with KSU-SUSFS, NetHunter, NoMount, Droidspaces/Docker, and performance features.
+QTI SM7325 (Snapdragon 778G) kernel, QGKI 5.4-based, with KernelSU-SUSFS and Droidspaces container support.
 
-## Source History
+## Base
 
-| Source | Contributions |
-|--------|---------------|
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `KSU-SUSFS` | KSU syscall tamper, full SUSFS, CASS, BBR |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | NetHunter Kconfig and driver configs |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `module` | Re:Kernel proc_ops, NF tables ranged sets, log silencing |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Test` | Critical task boost, security fixes, TCP data-race annotations |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `20260807-Bak` | TLB batched shootdown (arm64 memory management optimization) |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `20260805-bak` | Binder transaction logging, RPM-SMD deadlock fix |
-| [William24hmar](https://github.com/William24hmar/nothing_android_kernel_sm7325) `Nethunter` | Full cone NAT, IPVS conntrack integration, xt_ipvs matcher |
-| [maxsteeel](https://github.com/maxsteeel/nomount) | NoMount path redirection subsystem (5.4 kernel integration) |
-| [ExTV](https://github.com/ExTV) `DroidSpace` | Droidspaces/Docker namespace and container configs |
+[william24hmar](https://t.me/SpacewarBuilds) Re:Kernel with KSU-SUSFS.
 
-## Features
+## Cherry-picks (~41)
 
-- **KernelSU** with syscall tamper, Throne Tracker always threaded
-- **SUSFS** full support: sus_path, sus_mount, sus_kstat, try_umount, spoof_uname, hide_symbols, open_redirect, sus_map
-- **NoMount** path redirection (hooks in namei.c, d_path.c, readdir.c)
-- **CASS** scheduler + **BBR** default TCP congestion control
-- **NetHunter**: Wi-Fi monitor mode (mac80211, RTL8XXXU), WireGuard, HID gamepad (Dragonrise, Nintendo, Sony, Playstation, Pantherlord, Greenasia), USB networking, PPP/VPN, USB serial (PL2303, FTDI, CP210X)
-- **MPTCP** multipath TCP support
-- **Re:Kernel** - converts file_operations to proc_ops for /proc file compatibility
-- **Critical task boost** - binder PI bypass, sync wakeup, workqueue priority, rcu_hurry for smoother UI under load
-- **Security fixes** - CVE-2026-43499 (rtmutex UAF), binder UAF, af_unix UAF, ext4 LOGFLUSH
-- **TCP data-race annotations** - prevents race conditions in tp counters and dsack
-- **NF tables ranged sets** - multi-field firewall rule support
-- **Log silencing** - USB, IPC, serial, media, display driver log spam reduction
-- **Droidspaces / Docker** - container runtime support: Linux namespaces (PID, IPC, UTS, USER), cgroups (device, pids, net_prio), devtmpfs, bridge netfilter, NAT masquerade
-- **TLB batched shootdown** - faster memory management on arm64
-- **RPM-SMD deadlock fix** - prevents hang when waiting for RPM ACK
-- **LTO + O3** optimizations, **WALT** scheduler, **F2FS**
-- Dead code elimination and power efficient workqueues
-- Focaltech touchscreen DRM/FB fix (compile fix for KSU-SUSFS defconfig)
+### william24hmar | Re:Kernel upstream
+Critical task boost, binder logging, TCP annotations, full cone NAT, TLB shootdown fix, RPM-SMD fix, log silencing, NF tables.
 
-## Build Config
+### Security
+CVE-2026-43499 (rtmutex UAF) fix from test/module branches.
 
-```
-TARGET_KERNEL_CONFIG := vendor/lahaina-qgki_defconfig vendor/debugfs.config
-```
+## Droidspaces configs (14)
 
-KernelSU source is fetched automatically on first build via `voltage_Spacewar.mk`.
+All required features for Android container runtime (Droidspaces/Docker):
 
-## Credits
+| Batch | Configs | Status |
+|-------|---------|--------|
+| 1 | Namespaces (PID, UTS, IPC, USER) | Booting |
+| 2 | Cgroups (device, pids, net_prio) | Booting |
+| 3 | Devtmpfs, Netfilter | Booting |
+| 4 | More netfilter options | Booting |
+| 5 | Additional container features | Booting |
 
-- [William24hmar](https://github.com/William24hmar) - KSU-SUSFS and NetHunter kernel bases, `module`/`Test` branches
-- [backslashxx](https://github.com/backslashxx) - KernelSU syscall tamper
-- [maxsteeel](https://github.com/maxsteeel) - NoMount subsystem
-- [simonpunk](https://gitlab.com/simonpunk/susfs4ksu) - SUSFS
-- [RealJohnGalt](https://github.com/RealJohnGalt) - Critical task boost + CASS scheduler
-- [Jann Horn](https://github.com/thejh) - af_unix UAF fix
-- [Eric Dumazet](https://github.com/edumazet) - TCP data-race annotations
-- [Greg Kroah-Hartman](https://github.com/gregkh) - container_of cleanup
-- [ExTV](https://github.com/ExTV) - Droidspaces kernel reference for Spacewar
-- [ferstar](https://github.com/ferstar) - Full cone NAT, IPVS conntrack, xt_ipvs matcher
+## Build Fixes
+
+- Rekernel `proc_create_single` 5.4 compat
+- IPVS conntrack duplicate removal
+- `inode_lock_killable` helper backports
+- kjson Kconfig reference removal
+- `ANDROID_PARANOID_NETWORK=n` causes bootloop — must stay enabled on QGKI
+
+## KernelSU
+
+- SU-SFS base
+- `fix_ksu_dupes.sh` + `ksu_dupes.patch` — prevents duplicate `dispatch.c` insertion during build
+
+## Known Issues
+
+| Issue | Status |
+|-------|--------|
+| SYSVIPC / POSIX_MQUEUE | kABI patches cause bootloop on 5.4 QGKI (isolated but unfixed) |
+| Device-as-Webcam USB | QTI 5.4 kernel UVC limitation |
+| Portrait mode (Nothing Camera) | Requires factory persist calibration from stock NOS |
+
+## Branches
+
+| Branch | Description |
+|--------|-------------|
+| `voltage-nethunter` | Main (KSU + Droidspaces + william cherry-picks) |
+| `voltage` | A16 production |
+| `voltage-lr` | Long-running test |
+
+## Maintainer
+
+Ângelo Azevedo
